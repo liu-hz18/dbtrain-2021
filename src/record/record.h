@@ -13,6 +13,10 @@ class Record {
 
   Field *GetField(FieldID nPos) const;
   void SetField(FieldID nPos, Field *pField);
+  /**
+   * @brief 获得记录中字段数量
+   * @return Size 记录中字段的数量
+   */
   Size GetSize() const;
 
   virtual Size Load(const uint8_t *src) = 0;

@@ -12,7 +12,15 @@ namespace thdb {
  */
 class RecordPage : public LinkedPage {
  public:
+  /**
+   * @brief 构建一个新的定长记录页面
+   * @param nFixed 定长记录长度
+   */
   RecordPage(PageOffset nFixed, bool);
+  /**
+   * @brief 从MiniOS中重新导入一个定长记录页面
+   * @param nPageID 页面编号
+   */
   RecordPage(PageID nPageID);
   ~RecordPage();
 

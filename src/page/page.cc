@@ -26,11 +26,11 @@ void Page::SetPageID(PageID nPageID) {
   this->_bModified = true;
 }
 
-void Page::GetHeader(uint8_t *dst, PageOffset nSize, PageID nOffset) const {
+void Page::GetHeader(uint8_t *dst, PageOffset nSize, PageOffset nOffset) const {
   MiniOS::GetOS()->ReadPage(_nPageID, dst, nSize, nOffset);
 }
 
-void Page::SetHeader(const uint8_t *src, PageOffset nSize, PageID nOffset) {
+void Page::SetHeader(const uint8_t *src, PageOffset nSize, PageOffset nOffset) {
   MiniOS::GetOS()->WritePage(_nPageID, src, nSize, nOffset);
   this->_bModified = true;
 }
