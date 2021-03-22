@@ -32,3 +32,6 @@ build
 
 # DB files
 *.db
+
+# Patch files
+*.patch
