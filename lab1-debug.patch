@@ -1,0 +1,175 @@
+From 2fd729960bd1b58a1b133bfeefdbd97512b34df9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E8=91=A3=E6=98=8A=E6=96=87?= <dhw17@mails.tsinghua.edu.cn>
+Date: Mon, 22 Mar 2021 20:02:20 +0800
+Subject: [PATCH 1/2] Fix bugs in lab1.
+
+---
+ src/backend/backend.cc                         |  6 ++++--
+ src/field/string_field.cc                      |  3 ++-
+ src/manager/table_manager.cc                   |  2 +-
+ src/parser/ErrorListener.cc                    | 15 +++++++++++++++
+ src/parser/{ErrorListner.h => ErrorListener.h} |  6 +++---
+ src/parser/ErrorListner.cc                     | 15 ---------------
+ src/record/transform.cc                        |  2 +-
+ 7 files changed, 26 insertions(+), 23 deletions(-)
+ create mode 100644 src/parser/ErrorListener.cc
+ rename src/parser/{ErrorListner.h => ErrorListener.h} (69%)
+ delete mode 100644 src/parser/ErrorListner.cc
+
+diff --git a/src/backend/backend.cc b/src/backend/backend.cc
+index 64ad7da..07834a6 100644
+--- a/src/backend/backend.cc
++++ b/src/backend/backend.cc
+@@ -7,7 +7,7 @@
+ #include "macros.h"
+ #include "minios/os.h"
+ #include "page/record_page.h"
+-#include "parser/ErrorListner.h"
++#include "parser/ErrorListener.h"
+ #include "parser/SQLLexer.h"
+ #include "parser/SQLParser.h"
+ #include "parser/SystemVisitor.h"
+@@ -62,8 +62,10 @@ std::vector<Result *> Execute(Instance *pDB, const String &sSQL) {
+   CommonTokenStream sTokenStream(&iLexer);
+   SQLParser iParser(&sTokenStream);
+   iParser.removeErrorListeners();
+-  iParser.addErrorListener(new SyntaxErrorListner());
++  SyntaxErrorListener *pListener = new SyntaxErrorListener();
++  iParser.addErrorListener(pListener);
+   auto iTree = iParser.program();
++  delete pListener;
+   SystemVisitor iVisitor{pDB};
+   return iVisitor.visit(iTree);
+ }
+diff --git a/src/field/string_field.cc b/src/field/string_field.cc
+index 282bddb..a796b9a 100644
+--- a/src/field/string_field.cc
++++ b/src/field/string_field.cc
+@@ -15,7 +15,8 @@ void StringField::SetData(const uint8_t *src, Size nSize) {
+ }
+ 
+ void StringField::GetData(uint8_t *dst, Size nSize) const {
+-  memcpy(dst, _sData.c_str(), nSize);
++  memset(dst, 0, nSize);
++  memcpy(dst, _sData.c_str(), (nSize <= _sData.size()) ? nSize : _sData.size());
+ }
+ 
+ FieldType StringField::GetType() const { return FieldType::STRING_TYPE; }
+diff --git a/src/manager/table_manager.cc b/src/manager/table_manager.cc
+index 149398a..724e7f0 100644
+--- a/src/manager/table_manager.cc
++++ b/src/manager/table_manager.cc
+@@ -86,7 +86,7 @@ void TableManager::Load() {
+     StringField *pString = dynamic_cast<StringField *>(pRecord->GetField(0));
+     IntField *pInt = dynamic_cast<IntField *>(pRecord->GetField(1));
+     _iTableIDMap[pString->GetString()] = pInt->GetIntData();
+-    delete pData;
++    delete[] pData;
+   }
+   delete pRecord;
+   delete pPage;
+diff --git a/src/parser/ErrorListener.cc b/src/parser/ErrorListener.cc
+new file mode 100644
+index 0000000..3c9c738
+--- /dev/null
++++ b/src/parser/ErrorListener.cc
+@@ -0,0 +1,15 @@
++#include "ErrorListener.h"
++
++#include "exception/exceptions.h"
++
++namespace antlr4 {
++
++void SyntaxErrorListener::syntaxError(Recognizer *recognizer,
++                                      Token *offendingSymbol, size_t line,
++                                      size_t charPositionInLine,
++                                      const std::string &msg,
++                                      std::exception_ptr e) {
++  throw thdb::ParserException(msg);
++}
++
++}  // namespace antlr4
+diff --git a/src/parser/ErrorListner.h b/src/parser/ErrorListener.h
+similarity index 69%
+rename from src/parser/ErrorListner.h
+rename to src/parser/ErrorListener.h
+index b246da3..ad9971a 100644
+--- a/src/parser/ErrorListner.h
++++ b/src/parser/ErrorListener.h
+@@ -1,10 +1,10 @@
+-#ifndef THDB_ERROR_LISTNER_H_
+-#define THDB_ERROR_LISTNER_H_
++#ifndef THDB_ERROR_LISTENER_H_
++#define THDB_ERROR_LISTENER_H_
+ 
+ #include "antlr4-runtime.h"
+ 
+ namespace antlr4 {
+-class SyntaxErrorListner : public BaseErrorListener {
++class SyntaxErrorListener : public BaseErrorListener {
+   void syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line,
+                    size_t charPositionInLine, const std::string &msg,
+                    std::exception_ptr e) override;
+diff --git a/src/parser/ErrorListner.cc b/src/parser/ErrorListner.cc
+deleted file mode 100644
+index ef13543..0000000
+--- a/src/parser/ErrorListner.cc
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#include "ErrorListner.h"
+-
+-#include "exception/exceptions.h"
+-
+-namespace antlr4 {
+-
+-void SyntaxErrorListner::syntaxError(Recognizer *recognizer,
+-                                     Token *offendingSymbol, size_t line,
+-                                     size_t charPositionInLine,
+-                                     const std::string &msg,
+-                                     std::exception_ptr e) {
+-  throw thdb::ParserException(msg);
+-}
+-
+-}  // namespace antlr4
+diff --git a/src/record/transform.cc b/src/record/transform.cc
+index 4733e3e..8c4a86b 100644
+--- a/src/record/transform.cc
++++ b/src/record/transform.cc
+@@ -19,7 +19,7 @@ Field *Transform::GetField() const {
+   } else if (_iType == FieldType::FLOAT_TYPE) {
+     pField = new FloatField(std::stod(_sRaw));
+   } else if (_iType == FieldType::STRING_TYPE) {
+-    pField = new StringField(_sRaw.substr(1, _sRaw.size() - 1));
++    pField = new StringField(_sRaw.substr(1, _sRaw.size() - 2));
+   } else {
+     throw Exception();
+   }
+-- 
+2.20.1
+
+
+From 95839e55e583c8395093fc79be139e692a46a4de Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E8=91=A3=E6=98=8A=E6=96=87?= <dhw17@mails.tsinghua.edu.cn>
+Date: Mon, 22 Mar 2021 20:03:42 +0800
+Subject: [PATCH 2/2] Fix a bug in os.
+
+---
+ src/minios/os.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/minios/os.cc b/src/minios/os.cc
+index 49db245..9e7f80c 100644
+--- a/src/minios/os.cc
++++ b/src/minios/os.cc
+@@ -121,7 +121,7 @@ void MiniOS::StorePages() {
+ }
+ 
+ Size MiniOS::GetUsedSize() const {
+-  if (_pUsed) throw OsException();
++  if (!_pUsed) throw OsException();
+   return _pUsed->GetSize();
+ }
+ 
+-- 
+2.20.1
+

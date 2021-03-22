@@ -47,7 +47,7 @@ class RecordPage : public LinkedPage {
    */
   bool HasRecord(SlotID nSlotID);
   /**
-   * @brief 删除制定位置的记录
+   * @brief 删除指定位置的记录
    *
    * @param nSlotID 槽编号
    */
