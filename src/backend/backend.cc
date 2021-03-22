@@ -7,7 +7,7 @@
 #include "macros.h"
 #include "minios/os.h"
 #include "page/record_page.h"
-#include "parser/ErrorListner.h"
+#include "parser/ErrorListener.h"
 #include "parser/SQLLexer.h"
 #include "parser/SQLParser.h"
 #include "parser/SystemVisitor.h"
@@ -62,8 +62,10 @@ std::vector<Result *> Execute(Instance *pDB, const String &sSQL) {
   CommonTokenStream sTokenStream(&iLexer);
   SQLParser iParser(&sTokenStream);
   iParser.removeErrorListeners();
-  iParser.addErrorListener(new SyntaxErrorListner());
+  SyntaxErrorListener *pListener = new SyntaxErrorListener();
+  iParser.addErrorListener(pListener);
   auto iTree = iParser.program();
+  delete pListener;
   SystemVisitor iVisitor{pDB};
   return iVisitor.visit(iTree);
 }

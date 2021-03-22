@@ -19,7 +19,7 @@ Field *Transform::GetField() const {
   } else if (_iType == FieldType::FLOAT_TYPE) {
     pField = new FloatField(std::stod(_sRaw));
   } else if (_iType == FieldType::STRING_TYPE) {
-    pField = new StringField(_sRaw.substr(1, _sRaw.size() - 1));
+    pField = new StringField(_sRaw.substr(1, _sRaw.size() - 2));
   } else {
     throw Exception();
   }
