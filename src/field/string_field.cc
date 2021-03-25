@@ -2,7 +2,7 @@
 
 namespace thdb {
 
-StringField::StringField(Size nSize) { _sData = String("\0", nSize); }
+StringField::StringField(Size nSize) { _sData = String(nSize, 0); }
 
 StringField::StringField(const String &sData) { _sData = sData; }
 
@@ -15,7 +15,8 @@ void StringField::SetData(const uint8_t *src, Size nSize) {
 }
 
 void StringField::GetData(uint8_t *dst, Size nSize) const {
-  memcpy(dst, _sData.c_str(), nSize);
+  memset(dst, 0, nSize);
+  memcpy(dst, _sData.c_str(), (nSize <= _sData.size()) ? nSize : _sData.size());
 }
 
 FieldType StringField::GetType() const { return FieldType::STRING_TYPE; }

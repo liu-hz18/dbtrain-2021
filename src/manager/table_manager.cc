@@ -86,7 +86,7 @@ void TableManager::Load() {
     StringField *pString = dynamic_cast<StringField *>(pRecord->GetField(0));
     IntField *pInt = dynamic_cast<IntField *>(pRecord->GetField(1));
     _iTableIDMap[pString->GetString()] = pInt->GetIntData();
-    delete pData;
+    delete[] pData;
   }
   delete pRecord;
   delete pPage;

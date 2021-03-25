@@ -19,24 +19,24 @@ class Page {
 
   /**
    * @brief 读出无格式页面头部分的内容。
-   * 
+   *
    * @param dst 读出内容存放地址
    * @param nSize 读出内容长度
-   * @param nOffset 读出内容在头部分起始位置 
+   * @param nOffset 读出内容在头部分起始位置
    */
-  void GetHeader(uint8_t *dst, PageOffset nSize, PageID nOffset) const;
+  void GetHeader(uint8_t *dst, PageOffset nSize, PageOffset nOffset) const;
   /**
    * @brief 写入无格式页面头部分的内容。
-   * 
+   *
    * @param src 写入内容存放地址
    * @param nSize 写入内容长度
    * @param nOffset 读出内容在头部分起始位置
    */
-  void SetHeader(const uint8_t *src, PageOffset nSize, PageID nOffset);
+  void SetHeader(const uint8_t *src, PageOffset nSize, PageOffset nOffset);
 
   /**
    * @brief 读出无格式页面数据部分的内容。
-   * 
+   *
    * @param dst 读出内容存放地址
    * @param nSize 读出内容长度
    * @param nOffset 读出内容在数据部分起始位置
@@ -44,7 +44,7 @@ class Page {
   void GetData(uint8_t *dst, PageOffset nSize, PageOffset nOffset) const;
   /**
    * @brief 写入无格式页面数据部分的内容。
-   * 
+   *
    * @param src 写入内容存放地址
    * @param nSize 写入内容长度
    * @param nOffset 读出内容在数据部分起始位置

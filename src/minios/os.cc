@@ -122,7 +122,7 @@ void MiniOS::StorePages() {
 }
 
 Size MiniOS::GetUsedSize() const {
-  if (_pUsed) throw OsException();
+  if (!_pUsed) throw OsException();
   return _pUsed->GetSize();
 }
 

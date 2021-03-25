@@ -266,7 +266,7 @@ antlrcpp::Any SystemVisitor::visitWhere_operator_expression(
         "JOIN",
         new JoinCondition(iPair.first, nColIndex, iPairB.first, nColIndexB));
   }
-  double fValue = stof(ctx->expression()->value()->getText());
+  double fValue = stod(ctx->expression()->value()->getText());
   if (ctx->children[1]->getText() == "<") {
     return std::pair<String, Condition *>(
         iPair.first, new RangeCondition(nColIndex, DBL_MIN, fValue));

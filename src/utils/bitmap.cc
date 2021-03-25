@@ -23,7 +23,7 @@ void Bitmap::Set(Size pos) {
 void Bitmap::Unset(Size pos) {
   if (Get(pos)) {
     _pBits[pos >> 3] &= ~(1 << (pos & 7));
-    ++_nUsed;
+    --_nUsed;
   }
 }
 
