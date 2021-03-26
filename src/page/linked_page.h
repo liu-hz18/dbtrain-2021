@@ -40,9 +40,9 @@ class LinkedPage : public Page {
  protected:
   PageID _nNextID;
   PageID _nPrevID;
+  bool _bModified;
 
  private:
-  bool _bModified;
 };
 
 }  // namespace thdb

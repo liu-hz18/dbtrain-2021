@@ -9,6 +9,7 @@ class FloatField : public Field {
  public:
   FloatField() = default;
   FloatField(const double &fData);
+  FloatField(const uint8_t* src, Size nSize);
   ~FloatField() = default;
 
   void SetData(const uint8_t *src, Size nSize) override;

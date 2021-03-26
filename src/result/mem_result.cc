@@ -54,6 +54,7 @@ void MemResult::Display() const {
   line += "\n";
   std::cout << line;
   for (uint32_t i = 0; i < _iHeader.size(); i++) {
+    // std::setw 指定输出宽度为 widths[i]，右对齐
     std::cout << sep << std::setw(widths[i]) << _iHeader[i];
   }
   std::cout << sep << "\n";

@@ -8,6 +8,7 @@ namespace thdb {
 
 /**
  * @brief 定长记录页面。
+ *   一个slot中存放一个序列化的Record, 用Bitmap维护占用情况。插入使用 最先匹配
  *
  */
 class RecordPage : public LinkedPage {
@@ -62,6 +63,7 @@ class RecordPage : public LinkedPage {
 
   Size GetCap() const;
   Size GetUsed() const;
+  PageOffset GetFixedSize() const;
   bool Full() const;
   void Clear();
 
@@ -78,7 +80,7 @@ class RecordPage : public LinkedPage {
    */
   Size _nCap;
   /**
-   * @brief 表示槽占用状况的位图
+   * @brief 表示槽占用状况的位图，最多1024个槽
    */
   Bitmap *_pUsed;
 };

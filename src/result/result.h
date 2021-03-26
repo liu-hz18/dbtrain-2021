@@ -6,6 +6,7 @@
 
 namespace thdb {
 
+// 用于传递SQL语句执行结果并输出
 class Result {
  public:
   Result(const std::vector<String> &iHeader);

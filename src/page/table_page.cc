@@ -18,6 +18,7 @@ const PageOffset COLUMN_TYPE_OFFSET = 0;
 const PageOffset COLUMN_SIZE_OFFSET = 64;
 const PageOffset COLUMN_NAME_OFFSET = 192;
 
+// NOTE: 本构造对象 会 向OS请求新的页面
 TablePage::TablePage(const Schema &iSchema) : Page() {
   for (Size i = 0; i < iSchema.GetSize(); ++i) {
     Column iCol = iSchema.GetColumn(i);
@@ -28,10 +29,11 @@ TablePage::TablePage(const Schema &iSchema) : Page() {
   assert(_iColMap.size() == _iTypeVec.size());
   RecordPage *pPage = new RecordPage(GetTotalSize(), true);
   _nHeadID = _nTailID = pPage->GetPageID();
-  delete pPage;
+  delete pPage; // 向OS写回元数据信息
   _bModified = true;
 }
 
+// NOTE: 本构造对象 并不会 向OS请求新的页面
 TablePage::TablePage(PageID nPageID) : Page(nPageID) {
   Load();
   _bModified = false;
@@ -45,7 +47,7 @@ Size TablePage::GetFieldSize() const { return _iTypeVec.size(); }
 
 FieldID TablePage::GetFieldID(const String &sColName) const {
   if (_iColMap.find(sColName) == _iColMap.end()) throw TableException();
-  return _iColMap.find(sColName)->second;
+  return _iColMap.find(sColName)->second; // std::pair
 }
 
 std::vector<FieldType> TablePage::GetTypeVec() const { return _iTypeVec; }
@@ -77,11 +79,12 @@ bool CmpByValue(const std::pair<String, FieldID> &a,
   return a.second < b.second;
 }
 
+// 从 std::map<String, FieldID 序列化到 String 
 String BuildColumnsString(const std::map<String, FieldID> &iColMap) {
   if (iColMap.size() == 0) return "";
   std::vector<std::pair<String, FieldID>> iTempVec{iColMap.begin(),
                                                    iColMap.end()};
-  std::sort(iTempVec.begin(), iTempVec.end(), CmpByValue);
+  std::sort(iTempVec.begin(), iTempVec.end(), CmpByValue); // 按 FieldID 升序排序
   String sColumnsName = "";
   for (const auto &iPair : iTempVec) {
     sColumnsName += iPair.first;
@@ -90,6 +93,7 @@ String BuildColumnsString(const std::map<String, FieldID> &iColMap) {
   return sColumnsName.substr(0, sColumnsName.size());
 }
 
+// 从 sName(String) 反序列化到 std::map<String, FieldID>
 std::map<String, FieldID> LoadColumnsString(const String &sName) {
   std::map<String, FieldID> iColMap;
   size_t nBegin = 0, nEnd = 0;

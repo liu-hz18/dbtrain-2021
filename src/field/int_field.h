@@ -9,6 +9,7 @@ class IntField : public Field {
  public:
   IntField() = default;
   IntField(const int &nData);
+  IntField(const uint8_t* src, Size nSize);
   ~IntField() = default;
 
   void SetData(const uint8_t *src, Size nSize) override;

@@ -6,6 +6,7 @@
 #include "table/schema.h"
 #include "table/table.h"
 
+// 表管理器，用于管理Table指针的构建和析构
 namespace thdb {
 
 class TableManager {

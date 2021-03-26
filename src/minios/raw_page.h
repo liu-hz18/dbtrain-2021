@@ -14,7 +14,7 @@ class RawPage {
   void Write(const uint8_t* src, PageOffset nSize, PageOffset nOffset = 0);
 
  private:
-  uint8_t* _pData;
+  uint8_t* _pData; // 内存中的页
 };
 
 }  // namespace thdb

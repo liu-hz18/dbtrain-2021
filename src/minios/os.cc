@@ -12,11 +12,13 @@ namespace thdb {
 
 MiniOS *MiniOS::os = nullptr;
 
+// 单例模式，只返回1个操作系统实例
 MiniOS *MiniOS::GetOS() {
   if (os == nullptr) os = new MiniOS();
   return os;
 }
 
+// 写回的时候os实例销毁
 void MiniOS::WriteBack() {
   if (os != nullptr) {
     delete os;
@@ -24,8 +26,9 @@ void MiniOS::WriteBack() {
   }
 }
 
+// 构造函数中读取，析构函数写出的方式来进行持久化操作
 MiniOS::MiniOS() {
-  _pMemory = new RawPage *[MEM_PAGES];
+  _pMemory = new RawPage *[MEM_PAGES]; // 指针的数组，每个指针指向一个 RawPage
   _pUsed = new Bitmap(MEM_PAGES);
   memset(_pMemory, 0, MEM_PAGES);
   _nClock = 0;
@@ -37,13 +40,15 @@ MiniOS::~MiniOS() {
   StoreBitmap();
   StorePages();
   for (size_t i = 0; i < MEM_PAGES; ++i)
-    if (_pMemory[i]) delete _pMemory[i];
+    if (_pMemory[i]) delete _pMemory[i]; // 将已分配的页面空间释放（MiniOS对真实的OS释放）
   delete[] _pMemory;
   delete _pUsed;
 }
 
+// 分配一个新的页面，返回页面编号
 PageID MiniOS::NewPage() {
   Size tmp = _nClock;
+  // 从 _nClock 开始循环一圈，寻找第一个可以被分配的页面
   do {
     if (!_pUsed->Get(_nClock)) {
       _pMemory[_nClock] = new RawPage();
@@ -57,10 +62,11 @@ PageID MiniOS::NewPage() {
   throw NewPageException();
 }
 
+// 删除指定编号的页面, 不存在写回
 void MiniOS::DeletePage(PageID pid) {
   if (!_pUsed->Get(pid)) throw PageNotInitException(pid);
   delete _pMemory[pid];
-  _pMemory[pid] = 0;
+  _pMemory[pid] = 0; // set null
   _pUsed->Unset(pid);
 }
 
@@ -77,6 +83,7 @@ void MiniOS::WritePage(PageID pid, const uint8_t *src, PageOffset nSize,
 }
 
 void MiniOS::LoadBitmap() {
+  // bitmap序列化到磁盘文件，便于加载OS
   std::ifstream fin("THDB_BITMAP", std::ios::binary);
   if (!fin) return;
   uint8_t pTemp[MEM_PAGES / 8];
@@ -86,6 +93,7 @@ void MiniOS::LoadBitmap() {
 }
 
 void MiniOS::LoadPages() {
+  // 将Page从真实的磁盘中加载出来（之后利用内存模拟磁盘，只有析构的时候重新写入磁盘）
   std::ifstream fin("THDB_PAGE", std::ios::binary);
   if (!fin) return;
   uint8_t pTemp[PAGE_SIZE];
@@ -108,6 +116,7 @@ void MiniOS::StoreBitmap() {
   fout.close();
 }
 
+// 将内存中的页面写入磁盘
 void MiniOS::StorePages() {
   std::ofstream fout("THDB_PAGE", std::ios::binary);
   if (!fout) return;

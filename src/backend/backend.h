@@ -5,6 +5,7 @@
 #include "result/results.h"
 #include "system/instance.h"
 
+// 后端最顶层接口
 namespace thdb {
 
 bool Exists();

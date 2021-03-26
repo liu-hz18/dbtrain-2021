@@ -7,6 +7,11 @@ namespace thdb {
 
 IntField::IntField(const int &nData) : _nData(nData) {}
 
+IntField::IntField(const uint8_t* src, Size nSize) {
+  assert(nSize == 4);
+  memcpy((uint8_t *)&_nData, src, nSize);
+}
+
 void IntField::SetData(const uint8_t *src, Size nSize) {
   assert(nSize == 4);
   memcpy((uint8_t *)&_nData, src, nSize);

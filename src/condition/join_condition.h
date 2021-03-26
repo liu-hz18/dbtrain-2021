@@ -6,6 +6,7 @@
 
 namespace thdb {
 
+// 仅用于条件传递，暂时不会涉及
 class JoinCondition : public Condition {
  public:
   JoinCondition(const String &sTableA, FieldID nPosA, const String &sTableB,

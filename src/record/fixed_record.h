@@ -4,9 +4,11 @@
 #include "defines.h"
 #include "field/field.h"
 #include "record/record.h"
+#include "transform.h"
 
 namespace thdb {
 
+// 定长记录
 class FixedRecord : public Record {
  public:
   FixedRecord(Size nFieldSize, const std::vector<FieldType> &iTypeVec,
@@ -33,6 +35,8 @@ class FixedRecord : public Record {
    * @param iRawVec Insert语句中的String数组
    */
   void Build(const std::vector<String> &iRawVec) override;
+
+  void UpdateRaw(uint8_t* dst, const std::vector<Transform> &iTrans);
 
  private:
   /**

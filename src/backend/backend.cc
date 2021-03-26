@@ -50,6 +50,8 @@ void Close() {
 
 void Clear() {
   if (!Exists()) return;
+  // std::remove: 
+  //     Deletes the file identified by character string pointed to by `fname`
   std::remove("THDB_BITMAP");
   std::remove("THDB_PAGE");
 }

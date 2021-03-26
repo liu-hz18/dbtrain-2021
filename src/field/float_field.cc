@@ -8,6 +8,11 @@ namespace thdb {
 
 FloatField::FloatField(const double &fData) : _fData(fData) {}
 
+FloatField::FloatField(const uint8_t* src, Size nSize) {
+  assert(nSize == 8);
+  memcpy((uint8_t *)&_fData, src, nSize);
+}
+
 void FloatField::SetData(const uint8_t *src, Size nSize) {
   assert(nSize == 8);
   memcpy((uint8_t *)&_fData, src, nSize);

@@ -26,4 +26,22 @@ Field *Transform::GetField() const {
   return pField;
 }
 
+bool operator==(const Transform &a, const Transform &b) {
+  return a.GetPos() == b.GetPos();
+}
+
+bool operator<(const Transform &a, const Transform &b) {
+  return a.GetPos() < b.GetPos();
+}
+
+bool operator<=(const Transform &a, const Transform &b) {
+  return (a < b) || (a == b);
+}
+
+bool operator>(const Transform &a, const Transform &b) { return !(a <= b); }
+
+bool operator>=(const Transform &a, const Transform &b) { return !(a < b); }
+
+bool operator!=(const Transform &a, const Transform &b) { return !(a == b); }
+
 }  // namespace thdb

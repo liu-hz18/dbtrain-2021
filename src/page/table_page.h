@@ -10,6 +10,7 @@ namespace thdb {
 
 class Table;
 
+// 管理的是一个 Table的元数据 页面
 class TablePage : public Page {
  public:
   TablePage(const Schema &iSchema);

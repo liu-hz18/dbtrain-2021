@@ -3,6 +3,11 @@
 
 #include "defines.h"
 
+// 对于MiniOS提供的无格式页面进行解析，实现具有不同功能的格式化页面表示
+// 是OS分配的页面的管理者，可以写入或读出一个页面，并提供格式化功能。
+// 但是不管理页面的分配和回收(delete 是不会回收页面的)
+
+// 单个页面容量(4096Bytes, 4KB), 页面中头的长度(64Bytes)
 namespace thdb {
 /**
  * @brief 最为基本的格式化页面对象，实现了基本的页面内容读写操作。
@@ -30,7 +35,7 @@ class Page {
    *
    * @param src 写入内容存放地址
    * @param nSize 写入内容长度
-   * @param nOffset 读出内容在头部分起始位置
+   * @param nOffset 写入内容在头部分起始位置(即页内的 0 + nOffset)
    */
   void SetHeader(const uint8_t *src, PageOffset nSize, PageOffset nOffset);
 
@@ -47,7 +52,7 @@ class Page {
    *
    * @param src 写入内容存放地址
    * @param nSize 写入内容长度
-   * @param nOffset 读出内容在数据部分起始位置
+   * @param nOffset 写入内容在数据部分起始位置(即页内的 DATA_BEGIN_OFFSET + nOffset)
    */
   void SetData(const uint8_t *src, PageOffset nSize, PageOffset nOffset);
 

@@ -25,7 +25,7 @@ Size Record::GetSize() const { return _iFields.size(); }
 void Record::Clear() {
   for (const auto &pField : _iFields)
     if (pField) delete pField;
-  for (int i = 0; i < _iFields.size(); ++i) _iFields[i] = nullptr;
+  for (FieldID i = 0; i < _iFields.size(); ++i) _iFields[i] = nullptr;
 }
 
 String Record::ToString() {

@@ -6,6 +6,14 @@ StringField::StringField(Size nSize) { _sData = String(nSize, 0); }
 
 StringField::StringField(const String &sData) { _sData = sData; }
 
+StringField::StringField(const uint8_t* src, Size nSize) {
+  char *_pData = new char[nSize + 1];
+  _pData[nSize] = '\0';
+  memcpy(_pData, src, nSize);
+  _sData = String(_pData);
+  delete[] _pData;
+}
+
 void StringField::SetData(const uint8_t *src, Size nSize) {
   char *_pData = new char[nSize + 1];
   _pData[nSize] = '\0';

@@ -7,11 +7,13 @@ namespace thdb {
 
 const PageOffset DATA_BEGIN_OFFSET = HEADER_SIZE;
 
+// NOTE: 本构造对象 会 向OS请求新的页面
 Page::Page() {
   this->_bModified = true;
   this->_nPageID = MiniOS::GetOS()->NewPage();
 }
 
+// NOTE: 本构造对象 并不会 向OS请求新的页面
 Page::Page(PageID nPageID) {
   this->_bModified = false;
   this->_nPageID = nPageID;

@@ -14,6 +14,7 @@ enum class FieldType {
 
 class Field {
  public:
+  // buffer空间的申请和释放均不负责
   virtual void SetData(const uint8_t *src, Size nSize) = 0;
   virtual void GetData(uint8_t *dst, Size nSize) const = 0;
   virtual FieldType GetType() const = 0;

@@ -12,6 +12,7 @@ class StringField : public Field {
  public:
   StringField(Size nSize);
   StringField(const String &sData);
+  StringField(const uint8_t* src, Size nSize);
   ~StringField() = default;
 
   void SetData(const uint8_t *src, Size nSize) override;

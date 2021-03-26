@@ -3,6 +3,7 @@
 
 #include "record/record.h"
 
+// 用于条件检索的抽象类，实现统一的匹配函数
 namespace thdb {
 
 enum class ConditionType { SIMPLE_TYPE = 0, JOIN_TYPE = 1 };

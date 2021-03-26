@@ -6,6 +6,7 @@
 
 namespace thdb {
 
+// Table中的一列，只存储元信息，包括：列名、数据类型、单个数据的大小
 class Column {
  public:
   Column(const String &sName, FieldType iType);
@@ -19,7 +20,7 @@ class Column {
  private:
   String _sName;
   FieldType _iType;
-  Size _nSize;
+  Size _nSize; // 单个数据的大小
 };
 
 }  // namespace thdb

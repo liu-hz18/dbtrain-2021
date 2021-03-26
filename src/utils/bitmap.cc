@@ -37,12 +37,14 @@ bool Bitmap::Empty() const { return _nUsed == 0; }
 
 bool Bitmap::Full() const { return _nUsed == _nSize; }
 
+// 将 pBits 反序列化到 Bitmap
 void Bitmap::Load(const uint8_t *pBits) {
   memcpy(_pBits, pBits, (_nSize - 1) / 8 + 1);
   for (Size i = 0; i < _nSize; ++i)
     if (Get(i)) ++_nUsed;
 }
 
+// 将 Bitmap 序列化到 pBits
 void Bitmap::Store(uint8_t *pBits) {
   memcpy(pBits, _pBits, (_nSize - 1) / 8 + 1);
 }

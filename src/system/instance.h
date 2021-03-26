@@ -10,6 +10,7 @@
 
 namespace thdb {
 
+// 单个数据库实例
 class Instance {
  public:
   Instance();

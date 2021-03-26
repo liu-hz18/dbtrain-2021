@@ -27,7 +27,7 @@ Table *TableManager::GetTable(const String &sTableName) {
   if (_iTableMap.find(sTableName) == _iTableMap.end()) {
     if (_iTableIDMap.find(sTableName) == _iTableIDMap.end())
       return nullptr;
-    else {
+    else { // this is for more safety
       _iTableMap[sTableName] = new Table(_iTableIDMap[sTableName]);
       return _iTableMap[sTableName];
     }
@@ -47,8 +47,8 @@ Table *TableManager::AddTable(const String &sTableName, const Schema &iSchema) {
 }
 
 void TableManager::DropTable(const String &sTableName) {
-  if (GetTable(sTableName) == nullptr) throw TableNotExistException(sTableName);
   Table *pTable = GetTable(sTableName);
+  if (pTable == nullptr) throw TableNotExistException(sTableName);
   pTable->Clear();
   delete pTable;
   PageID nTableID = _iTableIDMap[sTableName];
@@ -68,8 +68,8 @@ void TableManager::Store() {
     pRecord->SetField(0, pString);
     pRecord->SetField(1, pInt);
     uint8_t pData[TABLE_NAME_SIZE + 4];
-    pRecord->Store(pData);
-    pPage->InsertRecord(pData);
+    pRecord->Store(pData); // 将 记录 序列化到 pRecord
+    pPage->InsertRecord(pData); 
   }
   delete pRecord;
   delete pPage;

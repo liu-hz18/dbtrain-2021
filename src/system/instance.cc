@@ -12,6 +12,7 @@
 
 namespace thdb {
 
+// 创建单个数据库实例
 Instance::Instance() { _pTableManager = new TableManager(); }
 
 Instance::~Instance() { delete _pTableManager; }
