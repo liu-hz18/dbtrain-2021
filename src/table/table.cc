@@ -85,7 +85,7 @@ void Table::DeleteRecord(PageID nPageID, SlotID nSlotID) {
   // TIPS: 注意更新 _nNotFull 来保证较高的页面空间利用效率
   RecordPage* record_page = new RecordPage(nPageID);
   record_page->DeleteRecord(nSlotID);
-  _nNotFull = nPageID;
+  _nNotFull = (nPageID < _nNotFull) ? nPageID : _nNotFull;
   delete record_page;
   // LAB1 END
 }
