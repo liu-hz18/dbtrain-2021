@@ -34,6 +34,8 @@ bool Instance::CreateTable(const String &sTableName, const Schema &iSchema) {
 }
 
 bool Instance::DropTable(const String &sTableName) {
+  for (const auto &sColName : _pIndexManager->GetTableIndexes(sTableName))
+    _pIndexManager->DropIndex(sTableName, sColName);
   _pTableManager->DropTable(sTableName);
   return true;
 }
@@ -80,7 +82,6 @@ std::vector<PageSlotID> Instance::Search(
   Table *pTable = GetTable(sTableName);
   if (pTable == nullptr) throw TableException();
   if (iIndexCond.size() > 0) {
-    printf("Indexes:%u\n", iIndexCond.size());
     IndexCondition *pIndexCond = dynamic_cast<IndexCondition *>(iIndexCond[0]);
     assert(pIndexCond != nullptr);
     auto iName = pIndexCond->GetIndexName();
