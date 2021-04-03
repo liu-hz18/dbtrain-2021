@@ -1,3 +1,4 @@
+#include "compare.h"
 #include "float_field.h"
 #include "int_field.h"
 #include "none_field.h"

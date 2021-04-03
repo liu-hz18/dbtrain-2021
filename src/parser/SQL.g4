@@ -35,7 +35,7 @@ statement
 
 db_statement
     : 'SHOW' 'TABLES'                   # show_tables
-	| 'SHOW' 'INDEXS'					# show_indexes
+	| 'SHOW' 'INDEXES'					# show_indexes
     ;
 
 table_statement
@@ -53,9 +53,7 @@ select_table
     ;
 
 index_statement
-    : 'CREATE' 'INDEX' Identifier 'ON' Identifier '(' identifiers ')'           # create_index
-    | 'DROP' 'INDEX' Identifier                                                 # drop_index
-    | 'ALTER' 'TABLE' Identifier 'ADD' 'INDEX' '(' identifiers ')'   			# alter_add_index
+    : 'ALTER' 'TABLE' Identifier 'ADD' 'INDEX' '(' identifiers ')'   			# alter_add_index
     | 'ALTER' 'TABLE' Identifier 'DROP' 'INDEX' '(' identifiers ')'             # alter_drop_index
     ;
 

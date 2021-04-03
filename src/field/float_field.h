@@ -18,6 +18,8 @@ class FloatField : public Field {
 
   String ToString() const override;
 
+  Field *Copy() const override;
+
   double GetFloatData() const;
 
  private:

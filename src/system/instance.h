@@ -3,6 +3,8 @@
 
 #include "defines.h"
 #include "field/fields.h"
+#include "index/index.h"
+#include "manager/index_manager.h"
 #include "manager/table_manager.h"
 #include "record/transform.h"
 #include "result/results.h"
@@ -21,9 +23,12 @@ class Instance {
   FieldType GetColType(const String &sTableName, const String &sColName) const;
   Size GetColSize(const String &sTableName, const String &sColName) const;
 
-  std::vector<PageSlotID> Search(const String &sTableName, Condition *pCond);
-  uint32_t Delete(const String &sTableName, Condition *pCond);
+  std::vector<PageSlotID> Search(const String &sTableName, Condition *pCond,
+                                 const std::vector<Condition *> &iIndexCond);
+  uint32_t Delete(const String &sTableName, Condition *pCond,
+                  const std::vector<Condition *> &iIndexCond);
   uint32_t Update(const String &sTableName, Condition *pCond,
+                  const std::vector<Condition *> &iIndexCond,
                   const std::vector<Transform> &iTrans);
   PageSlotID Insert(const String &sTableName,
                     const std::vector<String> &iRawVec);
@@ -34,8 +39,16 @@ class Instance {
   std::vector<String> GetColumnNames(const String &sTableName) const;
   Table *GetTable(const String &sTableName) const;
 
+  bool IsIndex(const String &sTableName, const String &sColName) const;
+  Index *GetIndex(const String &sTableName, const String &sColName) const;
+  std::vector<Record *> GetIndexInfos() const;
+  bool CreateIndex(const String &sTableName, const String &sColName,
+                   FieldType iType);
+  bool DropIndex(const String &sTableName, const String &sColName);
+
  private:
   TableManager *_pTableManager;
+  IndexManager *_pIndexManager;
 };
 
 }  // namespace thdb

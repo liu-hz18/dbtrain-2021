@@ -12,4 +12,6 @@ FieldType NoneField::GetType() const { return FieldType::NONE_TYPE; }
 
 String NoneField::ToString() const { return ""; }
 
+Field *NoneField::Copy() const { return new NoneField(); }
+
 }  // namespace thdb

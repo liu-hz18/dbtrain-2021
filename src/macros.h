@@ -19,6 +19,7 @@ const PageID TABLE_MANAGER_PAGEID = 2;
 const PageID INDEX_MANAGER_PAGEID = 3;
 
 const PageOffset TABLE_NAME_SIZE = 60;
+const PageOffset INDEX_NAME_SIZE = 124;
 const PageOffset COLUMN_NAME_SIZE = 60;
 
 }  // namespace thdb

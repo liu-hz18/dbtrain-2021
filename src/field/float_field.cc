@@ -28,6 +28,8 @@ String FloatField::ToString() const {
 
 double FloatField::GetFloatData() const { return _fData; }
 
+Field *FloatField::Copy() const { return new FloatField(_fData); }
+
 bool operator==(const FloatField &a, const FloatField &b) {
   return a.GetFloatData() == b.GetFloatData();
 }

@@ -80,6 +80,19 @@ std::vector<PageSlotID> Table::SearchRecord(Condition *pCond) {
   // LAB1 END
 }
 
+void Table::SearchRecord(std::vector<PageSlotID> &iPairs, Condition *pCond) {
+  if (!pCond) return;
+  auto it = iPairs.begin();
+  while (it != iPairs.end()) {
+    Record *pRecord = GetRecord(it->first, it->second);
+    if (!pCond->Match(*pRecord)) {
+      it = iPairs.erase(it);
+    } else
+      ++it;
+    delete pRecord;
+  }
+}
+
 void Table::Clear() {
   PageID nBegin = _nHeadID;
   while (nBegin != NULL_PAGE) {
