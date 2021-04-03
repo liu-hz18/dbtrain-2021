@@ -12,7 +12,7 @@ class IndexCondition : public Condition {
                  double fMax, FieldType iType);
   ~IndexCondition();
 
-  bool Match(const Record &iRecord) const;
+  bool Match(const Record &iRecord) const override;
   ConditionType GetType() const override;
 
   std::pair<String, String> GetIndexName() const;
