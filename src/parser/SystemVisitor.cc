@@ -305,9 +305,8 @@ antlrcpp::Any SystemVisitor::visitWhere_operator_expression(
         "JOIN",
         new JoinCondition(iPair.first, nColIndex, iPairB.first, nColIndexB));
   }
-<<<<<<< HEAD
   if (_pDB->IsIndex(iPair.first, iPair.second)) {
-    double fValue = stof(ctx->expression()->value()->getText());
+    double fValue = stod(ctx->expression()->value()->getText());
     FieldType iType = _pDB->GetColType(iPair.first, iPair.second);
     if (ctx->children[1]->getText() == "<") {
       return std::pair<String, Condition *>(
@@ -336,28 +335,6 @@ antlrcpp::Any SystemVisitor::visitWhere_operator_expression(
     } else {
       throw SpecialException();
     }
-=======
-  double fValue = stod(ctx->expression()->value()->getText());
-  if (ctx->children[1]->getText() == "<") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, DBL_MIN, fValue));
-  } else if (ctx->children[1]->getText() == ">") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, fValue + EPOSILO, DBL_MAX));
-  } else if (ctx->children[1]->getText() == "=") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, fValue, fValue + EPOSILO));
-  } else if (ctx->children[1]->getText() == "<=") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, DBL_MIN, fValue + EPOSILO));
-  } else if (ctx->children[1]->getText() == ">=") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, fValue, DBL_MAX));
-  } else if (ctx->children[1]->getText() == "<>") {
-    return std::pair<String, Condition *>(
-        iPair.first, new NotCondition(new RangeCondition(nColIndex, fValue,
-                                                         fValue + EPOSILO)));
->>>>>>> master
   } else {
     double fValue = stof(ctx->expression()->value()->getText());
     if (ctx->children[1]->getText() == "<") {
