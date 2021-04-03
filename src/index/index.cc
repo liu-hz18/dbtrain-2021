@@ -1,7 +1,5 @@
 #include "index/index.h"
 
-#include "page/node_page.h"
-
 namespace thdb {
 Index::Index(FieldType iType) {
   // TODO: 建立一个新的根节点，注意需要基于类型判断根节点的属性
