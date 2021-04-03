@@ -2,7 +2,7 @@
 
 namespace thdb {
 
-StringField::StringField(Size nSize) { _sData = String("\0", nSize); }
+StringField::StringField(Size nSize) { _sData = String(nSize, 0); }
 
 StringField::StringField(const String &sData) { _sData = sData; }
 
