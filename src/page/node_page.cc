@@ -18,7 +18,7 @@ const PageOffset KEY_TYPE_OFFSET = 20;
 NodePage::NodePage(Size nKeyLen, FieldType iKeyType, bool bLeaf)
     : _nKeyLen(nKeyLen), _iKeyType(iKeyType), _bLeaf(bLeaf) {
   // TODO: 基于自己实现的Store算法确定最大容量
-  // TODO: 如果为中间结点，注意可能需要初始化第一个子节点
+  // TODO: 如果为中间结点，注意可能需要初始化第一个子结点
 }
 
 NodePage::NodePage(Size nKeyLen, FieldType iKeyType, bool bLeaf,
@@ -44,45 +44,45 @@ NodePage::~NodePage() {
 
 bool NodePage::Insert(Field *pKey, const PageSlotID &iPair) {
   // TODO: 需要基于结点类型判断执行过程
-  // 叶节点：
+  // 叶结点：
   // 1.确定插入位置后插入数据即可
-  // 中间节点:
-  // 1.确定执行插入函数的子节点
-  // 2.对应的子节点执行插入函数
-  // 3.判断子节点是否为满结点，满结点时执行分裂
-  // 4.子节点分裂情况下需要更新KeyVec和ChildVec
+  // 中间结点:
+  // 1.确定执行插入函数的子结点
+  // 2.对应的子结点执行插入函数
+  // 3.判断子结点是否为满结点，满结点时执行分裂
+  // 4.子结点分裂情况下需要更新KeyVec和ChildVec
 
   // ALERT:
-  // 中间结点执行插入过程中，需要考虑到实际中间节点为空结点的特殊情况进行特判
-  // ALERT: 对于头结点的插入可能更新头节点的Key值
+  // 中间结点执行插入过程中，需要考虑到实际中间结点为空结点的特殊情况进行特判
+  // ALERT: 对于头结点的插入可能更新头结点的Key值
   // ALERT: KeyVec中的Key的赋值需要使用深拷贝，否则会出现析构导致的问题
   // ALERT: 上层保证每次插入的iPair不同
 }
 
 Size NodePage::Delete(Field *pKey) {
   // TODO: 需要基于结点类型判断执行过程
-  // 叶节点：
+  // 叶结点：
   // 1.确定删除位置后删除数据即可
-  // 中间节点:
-  // 1.确定执行删除函数的子节点
-  // 2.对应的子节点执行删除函数
-  // 3.判断子节点是否为满结点，空结点时清除空结点
+  // 中间结点:
+  // 1.确定执行删除函数的子结点
+  // 2.对应的子结点执行删除函数
+  // 3.判断子结点是否为满结点，空结点时清除空结点
   // 4.删除空结点情况下需要更新KeyVec和ChildVec
 
   // ALERT: 注意删除结点过程中如果清除了Key则需要析构
   // ALERT:
-  // 注意存在键值相同的情况发生，所以需要保证所有需要执行删除函数的子节点都执行了删除函数
+  // 注意存在键值相同的情况发生，所以需要保证所有需要执行删除函数的子结点都执行了删除函数
   // ALERT: 可以适当简化合并函数，例如不删除空的中间结点
 }
 
 bool NodePage::Delete(Field *pKey, const PageSlotID &iPair) {
   // TODO: 需要基于结点类型判断执行过程
-  // 叶节点：
+  // 叶结点：
   // 1.确定删除位置后删除数据即可
-  // 中间节点:
-  // 1.确定执行删除函数的子节点
-  // 2.对应的子节点执行删除函数
-  // 3.判断子节点是否为满结点，空结点时清除空结点
+  // 中间结点:
+  // 1.确定执行删除函数的子结点
+  // 2.对应的子结点执行删除函数
+  // 3.判断子结点是否为满结点，空结点时清除空结点
   // 4.删除空结点情况下需要更新KeyVec和ChildVec
 
   // ALERT:
@@ -92,11 +92,11 @@ bool NodePage::Delete(Field *pKey, const PageSlotID &iPair) {
 bool NodePage::Update(Field *pKey, const PageSlotID &iOld,
                       const PageSlotID &iNew) {
   // TODO: 需要基于结点类型判断执行过程
-  // 叶节点：
+  // 叶结点：
   // 1.确定更新位置后更新数据即可
-  // 中间节点:
-  // 1.确定执行更新函数的子节点
-  // 2.对应的子节点执行更新函数
+  // 中间结点:
+  // 1.确定执行更新函数的子结点
+  // 2.对应的子结点执行更新函数
 
   // ALERT: 由于更新函数不改变结点内存储的容量，所以不需要结构变化
   // ALERT:
@@ -105,19 +105,19 @@ bool NodePage::Update(Field *pKey, const PageSlotID &iOld,
 
 std::vector<PageSlotID> NodePage::Range(Field *pLow, Field *pHigh) {
   // TODO: 需要基于结点类型判断执行过程
-  // 叶节点：
+  // 叶结点：
   // 1.确定上下界范围，返回这一区间内的所有Value值
-  // 中间节点:
-  // 1.确定所有可能包含上下界范围的子节点
-  // 2.依次对添加各个子节点执行查询函数所得的结果
+  // 中间结点:
+  // 1.确定所有可能包含上下界范围的子结点
+  // 2.依次对添加各个子结点执行查询函数所得的结果
 
-  // ALERT: 注意叶节点可能为空结点，需要针对这种情况进行特判
+  // ALERT: 注意叶结点可能为空结点，需要针对这种情况进行特判
 }
 
 void NodePage::Clear() {
   // TODO: 需要基于结点类型判断执行过程
-  // 叶节点：直接释放占用空间
-  // 中间结点：先释放子节点空间，之后释放自身占用空间
+  // 叶结点：直接释放占用空间
+  // 中间结点：先释放子结点空间，之后释放自身占用空间
 }
 
 bool NodePage::Full() const { return _iKeyVec.size() == _nCap; }
@@ -147,9 +147,9 @@ std::pair<std::vector<Field *>, std::vector<PageSlotID>> NodePage::PopHalf() {
 
 void NodePage::InitFirst() {
   // TODO:
-  // 当初始化一个空的中间节点时，默认为其分配一个空的叶子节点有利于简化实现
+  // 当初始化一个空的中间结点时，默认为其分配一个空的叶子结点有利于简化实现
   // TODO:
-  // 此处需要基于结点Key的类型，初始化一个叶子节点并为KeyVec和ChildVec添加第一个值
+  // 此处需要基于结点Key的类型，初始化一个叶子结点并为KeyVec和ChildVec添加第一个值
 }
 
 void NodePage::ResetFirst() {

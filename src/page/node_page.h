@@ -10,9 +10,9 @@ namespace thdb {
 class Index;
 
 /**
- * @brief 同时表示了中间结点和叶节点。
- * 中间节点每个Key为子节点中Key的最小值，Value为子节点{PageID,0}。
- * 叶节点每个Key为实际字段的Key，Value为对应记录的PageSlotID。
+ * @brief 同时表示了中间结点和叶结点。
+ * 中间结点每个Key为子结点中Key的最小值，Value为子结点{PageID,0}。
+ * 叶结点每个Key为实际字段的Key，Value为对应记录的PageSlotID。
  */
 class NodePage : public Page {
  public:
@@ -24,13 +24,13 @@ class NodePage : public Page {
    */
   NodePage(Size nKeyLen, FieldType iKeyType, bool bLeaf);
   /**
-   * @brief 构建一个包含一定数量子节点的节点页面
+   * @brief 构建一个包含一定数量子结点的结点页面
    *
    * @param nKeyLen Key长度
    * @param iKeyType Key类型
-   * @param bLeaf 是否为叶节点
-   * @param iKeyVec 子节点的Key值
-   * @param iChildVec 子节点的Value值（PageSlotID数组）
+   * @param bLeaf 是否为叶结点
+   * @param iKeyVec 子结点的Key值
+   * @param iChildVec 子结点的Value值（PageSlotID数组）
    */
   NodePage(Size nKeyLen, FieldType iKeyType, bool bLeaf,
            const std::vector<Field *> &iKeyVec,
@@ -83,7 +83,7 @@ class NodePage : public Page {
    */
   std::vector<PageSlotID> Range(Field *pLow, Field *pHigh);
   /**
-   * @brief 清空当前结点和所有子节点所占用的所有空间
+   * @brief 清空当前结点和所有子结点所占用的所有空间
    */
   void Clear();
 
@@ -130,11 +130,11 @@ class NodePage : public Page {
   Size LessBound(Field *pKey);
 
   /**
-   * @brief 对于中间节点初始化第一个子叶节点
+   * @brief 对于中间结点初始化第一个子叶结点
    */
   void InitFirst();
   /**
-   * @brief 对于中间节点重置第一个子叶节点
+   * @brief 对于中间结点重置第一个子叶结点
    *
    */
   void ResetFirst();
