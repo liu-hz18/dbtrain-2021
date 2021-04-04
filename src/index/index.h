@@ -67,7 +67,7 @@ class Index {
   void Clear();
 
   /**
-   * @brief 获得根节点对应的页面编号
+   * @brief 获得根结点对应的页面编号
    * @return PageID
    */
   PageID GetRootID() const;

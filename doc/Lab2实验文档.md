@@ -28,7 +28,7 @@ make
 
 1. field模块添加了field指针的复制函数Copy，用于指针的深拷贝。同时添加了Equal, Less, Greater三个函数，用于同类型指针大小比较
 2. manager模块添加了index manager，用于管理index的创建、删除等操作，与table manager实现类似
-3. system种instance对于查询的执行过程添加了对于index的支持，默认在字段存在索引情况下优先通过索引进行查询
+3. system中instance对于查询的执行过程添加了对于index的支持，默认在字段存在索引情况下优先通过索引进行查询，**不要对此模块代码进行修改，否则将视为作弊行为**
 4. parser中添加了对于index相关语法的支持，包括创建和删除和显示index的相关语法
 5. 添加了index模块，需要同学们实现
 6. page模块中需要添加新的页面，lab2-simple中添加了node page用于表示树结点的页面
@@ -40,7 +40,7 @@ make
 
 实现思路：
 1. 合并分支，保持Lab1测试仍能通过
-2. 实现用于支持索引的相关数据类型的存储页面，例如中间结点页面、叶节点页面等，自行设计相关测试
+2. 实现用于支持索引的相关数据类型的存储页面，例如中间结点页面、叶结点页面等，自行设计相关测试
 3. 完成index最上层接口的实现
 
 # Lab2 需要实现的接口
@@ -51,7 +51,7 @@ make
     - 构建和析构函数
     - Insert 插入一个Key Value对
     - Delete 删除一个Key Value对
-    - Delete 删除全部一个Key值的Key Value对
+    - Delete 删除一个Key值的全部Key Value对
     - Update 将Key Value对中更新为新的Value
     - Range 左闭右开的范围查询
     - Clear 清除索引
@@ -62,7 +62,7 @@ lab2-simple分支的额外接口：
     - 构建和析构函数
     - Insert 在当前结点之下，插入一个Key Value对
     - Delete 在当前结点之下，删除一个Key Value对
-    - Delete 在当前结点之下，删除全部一个Key值的Key Value对
+    - Delete 在当前结点之下，删除一个Key值的全部Key Value对
     - Update 在当前结点之下，将Key Value对中更新为新的Value
     - Range 在当前结点之下，左闭右开的范围查询
     - Clear 在当前结点之下，清除索引
