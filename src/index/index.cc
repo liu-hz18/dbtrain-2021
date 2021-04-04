@@ -32,14 +32,14 @@ bool Index::Insert(Field *pKey, const PageSlotID &iPair) {
 
 Size Index::Delete(Field *pKey) {
   // ALERT:
-  // 结点合并实现难度较高，没有测例，不作为必要要求，感兴趣的同学可自行实现并设计测例
+  // 结点合并实现难度较高，没有测例，感兴趣的同学可自行实现并设计测例
   // TODO: 利用RootID获得根结点
   // TODO: 利用根结点的Delete执行删除
 }
 
 bool Index::Delete(Field *pKey, const PageSlotID &iPair) {
   // ALERT:
-  // 结点合并实现难度较高，不作为必要要求，感兴趣的同学可自行实现并设计测例
+  // 结点合并实现难度较高，没有测例，感兴趣的同学可自行实现并设计测例
   // TODO: 利用RootID获得根结点
   // TODO: 利用根结点的Delete执行删除
 }
