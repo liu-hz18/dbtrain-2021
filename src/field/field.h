@@ -19,6 +19,7 @@ class Field {
   virtual void GetData(uint8_t *dst, Size nSize) const = 0;
   virtual FieldType GetType() const = 0;
   virtual String ToString() const = 0;
+  virtual Field *Copy() const = 0;
 
   virtual ~Field() = default;
 };

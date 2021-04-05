@@ -33,6 +33,8 @@ String StringField::ToString() const { return _sData; }
 
 String StringField::GetString() const { return _sData; }
 
+Field *StringField::Copy() const { return new StringField(_sData); }
+
 bool operator==(const StringField &a, const StringField &b) {
   return a.GetString() == b.GetString();
 }

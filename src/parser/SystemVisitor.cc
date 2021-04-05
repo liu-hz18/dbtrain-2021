@@ -57,8 +57,12 @@ antlrcpp::Any SystemVisitor::visitShow_tables(
 
 antlrcpp::Any SystemVisitor::visitShow_indexes(
     SQLParser::Show_indexesContext *ctx) {
-  Result *res = new MemResult({"Show Indexes"});
+  Result *res = new MemResult(
+      {"Table Name", "Column Name", "Column Type", "Column Size"});
   // TODO: Add Some info
+  for (const auto &pRecord : _pDB->GetIndexInfos()) {
+    res->PushBack(pRecord);
+  }
   return res;
 }
 
@@ -131,11 +135,23 @@ antlrcpp::Any SystemVisitor::visitDescribe_table(
 antlrcpp::Any SystemVisitor::visitDelete_from_table(
     SQLParser::Delete_from_tableContext *ctx) {
   String sTableName = ctx->Identifier()->getText();
-  std::map<String, Condition *> iMap = ctx->where_and_clause()->accept(this);
+  std::map<String, std::vector<Condition *>> iMap =
+      ctx->where_and_clause()->accept(this);
   assert(iMap.size() == 1);
-  Size nSize = _pDB->Delete(sTableName, iMap[sTableName]);
+  std::vector<Condition *> iIndexCond{};
+  std::vector<Condition *> iOtherCond{};
+  for (const auto &pCond : iMap[sTableName])
+    if (pCond->GetType() == ConditionType::INDEX_TYPE)
+      iIndexCond.push_back(pCond);
+    else
+      iOtherCond.push_back(pCond);
+  Condition *pCond = nullptr;
+  if (iOtherCond.size() > 0) pCond = new AndCondition(iOtherCond);
+  Size nSize = _pDB->Delete(sTableName, pCond, iIndexCond);
   // TODO: Clear Condition
-  delete iMap[sTableName];
+  if (pCond) delete pCond;
+  for (const auto &it : iIndexCond)
+    if (it) delete it;
 
   Result *res = new MemResult({"Delete"});
   FixedRecord *pRes = new FixedRecord(1, {FieldType::INT_TYPE}, {4});
@@ -158,7 +174,8 @@ antlrcpp::Any SystemVisitor::visitUpdate_table(
   std::vector<std::pair<String, String>> iSetVec =
       ctx->set_clause()->accept(this);
   String sTableName = ctx->Identifier()->getText();
-  std::map<String, Condition *> iMap = ctx->where_and_clause()->accept(this);
+  std::map<String, std::vector<Condition *>> iMap =
+      ctx->where_and_clause()->accept(this);
   assert(iMap.size() == 1);
   std::vector<Transform> iTrans{};
   for (Size i = 0; i < iSetVec.size(); ++i) {
@@ -166,9 +183,20 @@ antlrcpp::Any SystemVisitor::visitUpdate_table(
     FieldType iType = _pDB->GetColType(sTableName, iSetVec[i].first);
     iTrans.push_back({nFieldID, iType, iSetVec[i].second});
   }
-  Size nSize = _pDB->Update(sTableName, iMap[sTableName], iTrans);
+  std::vector<Condition *> iIndexCond{};
+  std::vector<Condition *> iOtherCond{};
+  for (const auto &pCond : iMap[sTableName])
+    if (pCond->GetType() == ConditionType::INDEX_TYPE)
+      iIndexCond.push_back(pCond);
+    else
+      iOtherCond.push_back(pCond);
+  Condition *pCond = nullptr;
+  if (iOtherCond.size() > 0) pCond = new AndCondition(iOtherCond);
+  Size nSize = _pDB->Update(sTableName, pCond, iIndexCond, iTrans);
   // TODO: Clear Condition
-  delete iMap[sTableName];
+  if (pCond) delete pCond;
+  for (const auto &it : iIndexCond)
+    if (it) delete it;
 
   Result *res = new MemResult({"Update"});
   FixedRecord *pRes = new FixedRecord(1, {FieldType::INT_TYPE}, {4});
@@ -196,20 +224,33 @@ antlrcpp::Any SystemVisitor::visitSelect_table(
     SQLParser::Select_tableContext *ctx) {
   std::vector<String> iTableNameVec = ctx->identifiers()->accept(this);
   std::map<String, std::vector<PageSlotID>> iResultMap{};
-  std::map<String, Condition *> iCondMap{};
+  std::map<String, std::vector<Condition *>> iCondMap{};
   // TODO: Filter
   if (ctx->where_and_clause()) {
-    std::map<String, Condition *> iTempMap =
+    std::map<String, std::vector<Condition *>> iTempMap =
         ctx->where_and_clause()->accept(this);
     iCondMap = iTempMap;
   }
 
-  for (const auto &sTableName : iTableNameVec)
+  for (const auto &sTableName : iTableNameVec) {
     if (iCondMap.find(sTableName) == iCondMap.end())
-      iCondMap[sTableName] = new AndCondition({});
-
-  for (const auto &sTableName : iTableNameVec)
-    iResultMap[sTableName] = _pDB->Search(sTableName, iCondMap[sTableName]);
+      iResultMap[sTableName] = _pDB->Search(sTableName, nullptr, {});
+    else {
+      std::vector<Condition *> iIndexCond{};
+      std::vector<Condition *> iOtherCond{};
+      for (const auto &pCond : iCondMap[sTableName])
+        if (pCond->GetType() == ConditionType::INDEX_TYPE)
+          iIndexCond.push_back(pCond);
+        else
+          iOtherCond.push_back(pCond);
+      Condition *pCond = nullptr;
+      if (iOtherCond.size() > 0) pCond = new AndCondition(iOtherCond);
+      iResultMap[sTableName] = _pDB->Search(sTableName, pCond, iIndexCond);
+      if (pCond) delete pCond;
+      for (const auto &it : iIndexCond)
+        if (it) delete it;
+    }
+  }
 
   // TODO: Join
 
@@ -227,7 +268,7 @@ antlrcpp::Any SystemVisitor::visitSelect_table(
 
 antlrcpp::Any SystemVisitor::visitWhere_and_clause(
     SQLParser::Where_and_clauseContext *ctx) {
-  std::map<String, Condition *> iCondMap;
+  std::map<String, std::vector<Condition *>> iCondMap;
   for (const auto &it : ctx->where_clause()) {
     std::pair<String, Condition *> iCondPair = it->accept(this);
     // TODO: JOIN CONDITION
@@ -235,11 +276,9 @@ antlrcpp::Any SystemVisitor::visitWhere_and_clause(
     }
     // Not Join Condition
     if (iCondMap.find(iCondPair.first) == iCondMap.end()) {
-      iCondMap[iCondPair.first] = new AndCondition({});
+      iCondMap[iCondPair.first] = {};
     }
-    AndCondition *pCondition =
-        dynamic_cast<AndCondition *>(iCondMap[iCondPair.first]);
-    pCondition->PushBack(iCondPair.second);
+    iCondMap[iCondPair.first].push_back(iCondPair.second);
   }
   return iCondMap;
 }
@@ -266,28 +305,62 @@ antlrcpp::Any SystemVisitor::visitWhere_operator_expression(
         "JOIN",
         new JoinCondition(iPair.first, nColIndex, iPairB.first, nColIndexB));
   }
-  double fValue = stod(ctx->expression()->value()->getText());
-  if (ctx->children[1]->getText() == "<") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, DBL_MIN, fValue));
-  } else if (ctx->children[1]->getText() == ">") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, fValue + EPOSILO, DBL_MAX));
-  } else if (ctx->children[1]->getText() == "=") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, fValue, fValue + EPOSILO));
-  } else if (ctx->children[1]->getText() == "<=") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, DBL_MIN, fValue + EPOSILO));
-  } else if (ctx->children[1]->getText() == ">=") {
-    return std::pair<String, Condition *>(
-        iPair.first, new RangeCondition(nColIndex, fValue, DBL_MAX));
-  } else if (ctx->children[1]->getText() == "<>") {
-    return std::pair<String, Condition *>(
-        iPair.first, new NotCondition(new RangeCondition(nColIndex, fValue,
-                                                         fValue + EPOSILO)));
+  if (_pDB->IsIndex(iPair.first, iPair.second)) {
+    double fValue = stod(ctx->expression()->value()->getText());
+    FieldType iType = _pDB->GetColType(iPair.first, iPair.second);
+    if (ctx->children[1]->getText() == "<") {
+      return std::pair<String, Condition *>(
+          iPair.first, new IndexCondition(iPair.first, iPair.second, DBL_MIN,
+                                          fValue, iType));
+    } else if (ctx->children[1]->getText() == ">") {
+      return std::pair<String, Condition *>(
+          iPair.first, new IndexCondition(iPair.first, iPair.second,
+                                          fValue + EPOSILO, DBL_MAX, iType));
+    } else if (ctx->children[1]->getText() == "=") {
+      return std::pair<String, Condition *>(
+          iPair.first, new IndexCondition(iPair.first, iPair.second, fValue,
+                                          fValue + EPOSILO, iType));
+    } else if (ctx->children[1]->getText() == "<=") {
+      return std::pair<String, Condition *>(
+          iPair.first, new IndexCondition(iPair.first, iPair.second, DBL_MIN,
+                                          fValue + EPOSILO, iType));
+    } else if (ctx->children[1]->getText() == ">=") {
+      return std::pair<String, Condition *>(
+          iPair.first, new IndexCondition(iPair.first, iPair.second, fValue,
+                                          DBL_MAX, iType));
+    } else if (ctx->children[1]->getText() == "<>") {
+      return std::pair<String, Condition *>(
+          iPair.first, new NotCondition(new RangeCondition(nColIndex, fValue,
+                                                           fValue + EPOSILO)));
+    } else {
+      throw SpecialException();
+    }
   } else {
-    throw SpecialException();
+    double fValue = stod(ctx->expression()->value()->getText());
+    if (ctx->children[1]->getText() == "<") {
+      return std::pair<String, Condition *>(
+          iPair.first, new RangeCondition(nColIndex, DBL_MIN, fValue));
+    } else if (ctx->children[1]->getText() == ">") {
+      return std::pair<String, Condition *>(
+          iPair.first,
+          new RangeCondition(nColIndex, fValue + EPOSILO, DBL_MAX));
+    } else if (ctx->children[1]->getText() == "=") {
+      return std::pair<String, Condition *>(
+          iPair.first, new RangeCondition(nColIndex, fValue, fValue + EPOSILO));
+    } else if (ctx->children[1]->getText() == "<=") {
+      return std::pair<String, Condition *>(
+          iPair.first,
+          new RangeCondition(nColIndex, DBL_MIN, fValue + EPOSILO));
+    } else if (ctx->children[1]->getText() == ">=") {
+      return std::pair<String, Condition *>(
+          iPair.first, new RangeCondition(nColIndex, fValue, DBL_MAX));
+    } else if (ctx->children[1]->getText() == "<>") {
+      return std::pair<String, Condition *>(
+          iPair.first, new NotCondition(new RangeCondition(nColIndex, fValue,
+                                                           fValue + EPOSILO)));
+    } else {
+      throw SpecialException();
+    }
   }
 }
 
@@ -310,6 +383,47 @@ antlrcpp::Any SystemVisitor::visitValue_list(
   std::vector<String> iValueList;
   for (const auto &it : ctx->value()) iValueList.push_back(it->getText());
   return iValueList;
+}
+
+antlrcpp::Any SystemVisitor::visitAlter_add_index(
+    SQLParser::Alter_add_indexContext *ctx) {
+  String sTableName = ctx->Identifier()->getText();
+  std::vector<String> iColNameVec = ctx->identifiers()->accept(this);
+  Size nSize = 0;
+  for (const auto &sColName : iColNameVec) {
+    try {
+      FieldType iType = _pDB->GetColType(sTableName, sColName);
+      _pDB->CreateIndex(sTableName, sColName, iType);
+      ++nSize;
+    } catch (const std::exception &e) {
+      std::cerr << e.what() << '\n';
+    }
+  }
+  Result *res = new MemResult({"Create Index"});
+  FixedRecord *pRes = new FixedRecord(1, {FieldType::INT_TYPE}, {4});
+  pRes->SetField(0, new IntField(nSize));
+  res->PushBack(pRes);
+  return res;
+}
+
+antlrcpp::Any SystemVisitor::visitAlter_drop_index(
+    SQLParser::Alter_drop_indexContext *ctx) {
+  String sTableName = ctx->Identifier()->getText();
+  std::vector<String> iColNameVec = ctx->identifiers()->accept(this);
+  Size nSize = 0;
+  for (const auto &sColName : iColNameVec) {
+    try {
+      _pDB->DropIndex(sTableName, sColName);
+      ++nSize;
+    } catch (const std::exception &e) {
+      std::cerr << e.what() << '\n';
+    }
+  }
+  Result *res = new MemResult({"Drop Index"});
+  FixedRecord *pRes = new FixedRecord(1, {FieldType::INT_TYPE}, {4});
+  pRes->SetField(0, new IntField(nSize));
+  res->PushBack(pRes);
+  return res;
 }
 
 }  // namespace thdb

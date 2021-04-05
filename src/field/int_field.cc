@@ -28,6 +28,8 @@ String IntField::ToString() const { return std::to_string(_nData); }
 
 int IntField::GetIntData() const { return _nData; }
 
+Field *IntField::Copy() const { return new IntField(_nData); }
+
 bool operator==(const IntField &a, const IntField &b) {
   return a.GetIntData() == b.GetIntData();
 }

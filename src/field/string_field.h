@@ -20,6 +20,8 @@ class StringField : public Field {
 
   FieldType GetType() const override;
 
+  Field *Copy() const override;
+
   String ToString() const override;
 
   String GetString() const;

@@ -19,6 +19,8 @@ class IntField : public Field {
 
   std::string ToString() const override;
 
+  Field *Copy() const override;
+
   int GetIntData() const;
 
  private:
