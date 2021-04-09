@@ -17,6 +17,7 @@ typedef uint16_t SlotID;
 typedef uint16_t FieldID;
 typedef std::string String;
 typedef uint32_t Size;
+typedef int32_t Rank;
 
 typedef std::pair<PageID, SlotID> PageSlotID;
 

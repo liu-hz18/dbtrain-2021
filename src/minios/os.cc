@@ -135,4 +135,8 @@ Size MiniOS::GetUsedSize() const {
   return _pUsed->GetSize();
 }
 
+bool MiniOS::Used(PageID pid) const {
+  return _pUsed->Get(pid);
+}
+
 }  // namespace thdb

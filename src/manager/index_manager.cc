@@ -71,7 +71,8 @@ void IndexManager::DropIndex(const String &sTableName, const String &sColName) {
   pIndex->Clear();
   delete pIndex;
   PageID nRoot = _iIndexIDMap[sIndexName];
-  MiniOS::GetOS()->DeletePage(nRoot);
+  assert(!MiniOS::GetOS()->Used(nRoot));
+  // MiniOS::GetOS()->DeletePage(nRoot);
   _iIndexIDMap.erase(sIndexName);
   _iIndexMap.erase(sIndexName);
   assert(_iTableIndexes.find(sTableName) != _iTableIndexes.end());

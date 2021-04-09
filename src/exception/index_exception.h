@@ -10,6 +10,10 @@ class IndexException : public Exception {
   virtual const char* what() const throw() { return "Index Exception"; }
 };
 
+class IndexTypeException : public IndexException {
+  virtual const char* what() const throw() { return "Unknown Index Type Exception"; }
+};
+
 }  // namespace thdb
 
 #endif

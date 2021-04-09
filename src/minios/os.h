@@ -22,6 +22,7 @@ class MiniOS {
   void WritePage(PageID pid, const uint8_t *src, PageOffset nSize,
                  PageOffset nOffset = 0);
   Size GetUsedSize() const;
+  bool Used(PageID pid) const;
 
  private:
   MiniOS();
