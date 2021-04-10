@@ -322,7 +322,7 @@ std::vector<PageSlotID> Index::Range(Field *pLow, Field *pHigh) {
                 std::vector<PageSlotID> temp = curleaf->GetAllValueByRank(i);
                 result.insert(result.end(), temp.begin(), temp.end());
             }
-            if (i < curleaf->GetSize()) {
+            if (i >= curleaf->GetSize()) {
                 leafID = curleaf->GetNextLeafID();
                 delete curleaf;
             } else {
