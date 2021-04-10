@@ -5,6 +5,9 @@
 #include <vector>
 #include <algorithm>
 
+#include <iostream>
+using namespace std;
+
 namespace thdb {
 
 const PageOffset NODE_TYPE_OFFSET = 4;
@@ -18,13 +21,19 @@ const PageOffset NODE_DATA_OFFSET = 28;
 BPTreeNode::BPTreeNode(Size nKeySize, FieldType iKeyType, NodeType iNodeType): 
     Page(), _bModified(true), _iNodeType(iNodeType), _iKeyType(iKeyType),
     _nKeySize(nKeySize) {
-    _nCap = (PAGE_SIZE - NODE_DATA_OFFSET) / (_nKeySize + 8 + 4);
+    if (_iNodeType == NodeType::INNER_NODE_TYPE) {
+        _nCap = (PAGE_SIZE - NODE_DATA_OFFSET) / (_nKeySize + 4);
+    } else {
+        _nCap = (PAGE_SIZE - NODE_DATA_OFFSET) / (_nKeySize + 8 + 4);
+    }
     _nNextID = NULL_PAGE;
     _nParentID = NULL_PAGE;
 }
+
 BPTreeNode::BPTreeNode(PageID nPageID): Page(nPageID), _bModified(false) {
     Load();
 }
+
 BPTreeNode::~BPTreeNode() {
     if (_bModified) Store();
 }
@@ -198,7 +207,11 @@ void BPTreeNode::Load() {
     minios->ReadPage(_nPageID, (uint8_t *)&size, 4, NODE_SIZE_OFFSET);
     minios->ReadPage(_nPageID, (uint8_t *)&_nNextID, 4, NODE_NEXT_OFFSET);
     minios->ReadPage(_nPageID, (uint8_t *)&_nParentID, 4, NODE_PARENT_OFFSET);
-    _nCap = (PAGE_SIZE - NODE_DATA_OFFSET) / (_nKeySize + 8 + 4);
+    if (_iNodeType == NodeType::INNER_NODE_TYPE) {
+        _nCap = (PAGE_SIZE - NODE_DATA_OFFSET) / (_nKeySize + 4);
+    } else {
+        _nCap = (PAGE_SIZE - NODE_DATA_OFFSET) / (_nKeySize + 8 + 4);
+    }
     // assert(size <= _nCap);
     PageOffset valueBegin = NODE_DATA_OFFSET + _nCap * _nKeySize;
     PageOffset overflowBegin = valueBegin + _nCap * 8;
@@ -208,7 +221,7 @@ void BPTreeNode::Load() {
             PageSlotID value;
             Field* _field;
             minios->ReadPage(_nPageID, dst, _nKeySize, NODE_DATA_OFFSET + i * _nKeySize);
-            minios->ReadPage(_nPageID, (uint8_t *)&(value.first), 4, valueBegin + i * 8);
+            minios->ReadPage(_nPageID, (uint8_t *)&(value.first), 4, valueBegin + i * 4);
             if (_iKeyType == FieldType::INT_TYPE) {
                 _field = new IntField(dst, _nKeySize);
             } else if (_iKeyType == FieldType::FLOAT_TYPE) {
@@ -260,7 +273,7 @@ void BPTreeNode::Store() {
         for (Size i = 0; i < size; ++i) {
             _iKeyVec[i]->GetData(dst, _nKeySize);
             minios->WritePage(_nPageID, dst, _nKeySize, NODE_DATA_OFFSET + i * _nKeySize);
-            minios->WritePage(_nPageID, (uint8_t *)&(_iChildVec[i].first), 4, valueBegin + i * 8);
+            minios->WritePage(_nPageID, (uint8_t *)&(_iChildVec[i].first), 4, valueBegin + i * 4);
         }
     } else {
         for (Size i = 0; i < size; ++i) {
