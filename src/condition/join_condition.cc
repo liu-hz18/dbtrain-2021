@@ -2,10 +2,12 @@
 
 namespace thdb {
 
-JoinCondition::JoinCondition(const String &sTableA, FieldID nPosA,
-                             const String &sTableB, FieldID nPosB) {
-  iTableColA = {sTableA, nPosA};
-  iTableColB = {sTableB, nPosB};
+JoinCondition::JoinCondition(const String &sTableA, const String &sColA,
+                             const String &sTableB, const String &sColB) {
+  this->sTableA = sTableA;
+  this->sTableB = sTableB;
+  this->sColA = sColA;
+  this->sColB = sColB;
 }
 
 bool JoinCondition::Match(const Record &iRecord) const { return true; }

@@ -1,5 +1,7 @@
 #include "record/record.h"
 
+#include <cstring>
+
 #include "exception/exceptions.h"
 
 namespace thdb {
@@ -26,6 +28,28 @@ void Record::Clear() {
   for (const auto &pField : _iFields)
     if (pField) delete pField;
   for (int i = 0; i < _iFields.size(); ++i) _iFields[i] = nullptr;
+}
+
+void Record::Sub(const std::vector<Size> &iPos) {
+  bool bInSub[GetSize()];
+  memset(bInSub, 0, GetSize() * sizeof(bool));
+  for (const auto nPos : iPos) bInSub[nPos] = 1;
+  auto itField = _iFields.begin();
+  for (Size i = 0; i < GetSize(); ++i) {
+    if (!bInSub[i]) {
+      Field *pField = *itField;
+      if (pField) delete pField;
+      itField = _iFields.erase(itField);
+    } else {
+      ++itField;
+    }
+  }
+}
+
+void Record::Add(Record *pRecord) {
+  for (Size i = 0; i < pRecord->GetSize(); ++i) {
+    _iFields.push_back(pRecord->GetField(i)->Copy());
+  }
 }
 
 String Record::ToString() {

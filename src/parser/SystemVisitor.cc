@@ -253,17 +253,28 @@ antlrcpp::Any SystemVisitor::visitSelect_table(
   }
 
   // TODO: Join
-
-  // TODO: Clear Condtion
+  bool bJoin = (iResultMap.size() > 1);
+  std::vector<Condition *> iJoinConds = {};
+  if (iCondMap.find("JOIN") != iCondMap.end()) {
+    iJoinConds = iCondMap.find("JOIN")->second;
+  }
+  std::pair<std::vector<String>, std::vector<Record *>> iHeadDataPair{};
+  if (bJoin) iHeadDataPair = _pDB->Join(iResultMap, iJoinConds);
 
   // TODO: Generate Result
-  assert(iResultMap.size() == 1);
-  String sTableName = iTableNameVec[0];
-  auto iData = iResultMap[sTableName];
-  Result *pResult = new MemResult(_pDB->GetColumnNames(sTableName));
-  for (const auto &it : iData)
-    pResult->PushBack(_pDB->GetRecord(iTableNameVec[0], it));
-  return pResult;
+  std::vector<PageSlotID> iData;
+  if (!bJoin) {
+    String sTableName = iTableNameVec[0];
+    iData = iResultMap[sTableName];
+    Result *pResult = new MemResult(_pDB->GetColumnNames(sTableName));
+    for (const auto &it : iData)
+      pResult->PushBack(_pDB->GetRecord(iTableNameVec[0], it));
+    return pResult;
+  } else {
+    Result *pResult = new MemResult(iHeadDataPair.first);
+    for (const auto &pRecord : iHeadDataPair.second) pResult->PushBack(pRecord);
+    return pResult;
+  }
 }
 
 antlrcpp::Any SystemVisitor::visitWhere_and_clause(
@@ -300,10 +311,9 @@ antlrcpp::Any SystemVisitor::visitWhere_operator_expression(
     // JOIN CONDITION
     std::pair<String, String> iPairB =
         ctx->expression()->column()->accept(this);
-    FieldID nColIndexB = _pDB->GetColID(iPairB.first, iPairB.second);
     return std::pair<String, Condition *>(
-        "JOIN",
-        new JoinCondition(iPair.first, nColIndex, iPairB.first, nColIndexB));
+        "JOIN", new JoinCondition(iPair.first, iPair.second, iPairB.first,
+                                  iPairB.second));
   }
   if (_pDB->IsIndex(iPair.first, iPair.second)) {
     double fValue = stod(ctx->expression()->value()->getText());

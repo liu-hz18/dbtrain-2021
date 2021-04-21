@@ -57,4 +57,43 @@ void FixedRecord::Build(const std::vector<String> &iRawVec) {
   }
 }
 
+Record *FixedRecord::Copy() const {
+  Record *pRecord = new FixedRecord(GetSize(), _iTypeVec, _iSizeVec);
+  for (Size i = 0; i < GetSize(); ++i)
+    pRecord->SetField(i, GetField(i)->Copy());
+  return pRecord;
+}
+
+void FixedRecord::Sub(const std::vector<Size> &iPos) {
+  bool bInSub[GetSize()];
+  memset(bInSub, 0, GetSize() * sizeof(bool));
+  for (const auto nPos : iPos) bInSub[nPos] = 1;
+  auto itField = _iFields.begin();
+  auto itType = _iTypeVec.begin();
+  auto itSize = _iSizeVec.begin();
+  for (Size i = 0; i < GetSize(); ++i) {
+    if (!bInSub[i]) {
+      Field *pField = *itField;
+      if (pField) delete pField;
+      itField = _iFields.erase(itField);
+      itType = _iTypeVec.erase(itType);
+      itSize = _iSizeVec.erase(itSize);
+    } else {
+      ++itField;
+      ++itType;
+      ++itSize;
+    }
+  }
+}
+
+void FixedRecord::Add(Record *pRecord) {
+  FixedRecord *pFixed = dynamic_cast<FixedRecord *>(pRecord);
+  assert(pFixed != nullptr);
+  for (Size i = 0; i < pFixed->GetSize(); ++i) {
+    _iFields.push_back(pFixed->GetField(i)->Copy());
+    _iTypeVec.push_back(pFixed->_iTypeVec[i]);
+    _iSizeVec.push_back(pFixed->_iSizeVec[i]);
+  }
+}
+
 }  // namespace thdb

@@ -8,13 +8,13 @@ namespace thdb {
 
 class JoinCondition : public Condition {
  public:
-  JoinCondition(const String &sTableA, FieldID nPosA, const String &sTableB,
-                FieldID nPosB);
+  JoinCondition(const String &sTableA, const String &sColA,
+                const String &sTableB, const String &sColB);
   ~JoinCondition() = default;
   bool Match(const Record &iRecord) const override;
   ConditionType GetType() const override;
-  std::pair<String, FieldID> iTableColA;
-  std::pair<String, FieldID> iTableColB;
+  String sTableA, sTableB;
+  String sColA, sColB;
 };
 
 }  // namespace thdb
