@@ -125,7 +125,7 @@ class NodePage : public Page {
    */
   Size UpperBound(Field *pKey);
   /**
-   * @brief 小于pKey的最后一个Key在KeyVec中的位置
+   * @brief 小于等于pKey的最后一个Key在KeyVec中的位置
    */
   Size LessBound(Field *pKey);
 
