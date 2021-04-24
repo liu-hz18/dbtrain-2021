@@ -285,9 +285,9 @@ std::pair<std::vector<String>, std::vector<Record *>> Instance::Join(
   // TIPS:利用GetColID/Type/Size三个函数可以基于表名和列名获得列的信息
   // TIPS:利用IsIndex可以判断列是否存在索引
   // TIPS:利用GetIndex可以获得索引Index*指针
-  // TIPS:在多表JOIN时，可以采用并查集或执行树来确定执行JOIN的数据内容
 
   // EXTRA:JOIN的表的数量超过2时，所以需要先计算一个JOIN执行计划（不要求复杂算法）,有兴趣的同学可以自行实现
+  // EXTRA:在多表JOIN时，可以采用并查集或执行树来确定执行JOIN的数据内容
 
   // LAB3 END
 }
