@@ -15,6 +15,7 @@ class MemResult : public Result {
   Record *GetRecord(Size nPos) const override;
   Size GetSize() const override;
   String ToString() const override;
+  std::vector<String> ToVector() const override;
   void Display() const override;
 
  private:

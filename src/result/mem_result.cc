@@ -32,6 +32,21 @@ String MemResult::ToString() const {
   return result;
 }
 
+std::vector<String> MemResult::ToVector() const {
+  std::vector<String> results;
+  for (const auto &record : _iData) {
+    String result;
+    for (uint32_t i = 0; i < record->GetSize(); i++) {
+      result += record->GetField(i)->ToString();
+      if (i != record->GetSize() - 1) {
+        result += ",";
+      }
+    }
+    results.push_back(result);
+  }
+  return results;
+}
+
 void MemResult::Display() const {
   std::vector<Size> widths(_iHeader.size(), 0);
   String line_sep = "+";

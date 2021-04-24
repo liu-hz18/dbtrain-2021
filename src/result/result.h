@@ -15,6 +15,7 @@ class Result {
   virtual Record *GetRecord(Size nPos) const = 0;
   virtual Size GetSize() const = 0;
   virtual String ToString() const = 0;
+  virtual std::vector<String> ToVector() const = 0;
   virtual void Display() const = 0;
 
  protected:
