@@ -38,6 +38,7 @@ class FixedRecord : public Record {
 
   void Sub(const std::vector<Size> &iPos) override;
   void Add(Record *pRecord) override;
+  void Remove(FieldID nPos) override;
 
  private:
   /**

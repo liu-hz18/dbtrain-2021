@@ -1,5 +1,7 @@
 #include "record/record.h"
 
+#include <assert.h>
+
 #include <cstring>
 
 #include "exception/exceptions.h"
@@ -50,6 +52,13 @@ void Record::Add(Record *pRecord) {
   for (Size i = 0; i < pRecord->GetSize(); ++i) {
     _iFields.push_back(pRecord->GetField(i)->Copy());
   }
+}
+
+void Record::Remove(FieldID nPos) {
+  assert(nPos < GetSize());
+  auto it = _iFields.begin() + nPos;
+  if (*it) delete (*it);
+  _iFields.erase(it);
 }
 
 String Record::ToString() {

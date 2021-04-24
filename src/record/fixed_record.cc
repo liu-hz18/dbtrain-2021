@@ -96,4 +96,12 @@ void FixedRecord::Add(Record *pRecord) {
   }
 }
 
+void FixedRecord::Remove(FieldID nPos) {
+  Record::Remove(nPos);
+  auto itType = _iTypeVec.begin() + nPos;
+  auto itSize = _iSizeVec.begin() + nPos;
+  _iTypeVec.erase(itType);
+  _iSizeVec.erase(itSize);
+}
+
 }  // namespace thdb

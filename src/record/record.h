@@ -35,6 +35,10 @@ class Record {
    * @brief 向Record后添加部分字段
    */
   virtual void Add(Record *pRecord);
+  /**
+   * @brief 删除Record中一个字段
+   */
+  virtual void Remove(FieldID nPos);
 
   void Clear();
   String ToString();
