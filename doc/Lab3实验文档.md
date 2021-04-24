@@ -43,7 +43,38 @@ make
 
 ## Lab3 样例
 
+JOIN的两个表
+```sh
+> SELECT * FROM students;
+ +--------+------------+-----------+
+ | stu_id | first_name | last_name | 
+ +--------+------------+-----------+
+ |      1 |      James |     Smith | 
+ |      2 |    Michael |   Johnson | 
+ |      3 |     Thomas |     Brown | 
+ +--------+------------+-----------+
 
+> SELECT * FROM students_courses;
+ +--------+-----------+
+ | stu_id | course_id | 
+ +--------+-----------+
+ |      1 |         1 | 
+ |      2 |         3 | 
+ |      3 |         2 | 
+ |      1 |         3 | 
+ +--------+-----------+
+
+> SELECT * FROM students, students_courses WHERE students.stu_id = students_courses.stu_id;
+ +--------+------------+-----------+--------+-----------+
+ | stu_id | first_name | last_name | stu_id | course_id | 
+ +--------+------------+-----------+--------+-----------+
+ |      1 |      James |     Smith |      1 |         1 | 
+ |      1 |      James |     Smith |      1 |         3 | 
+ |      2 |    Michael |   Johnson |      2 |         3 | 
+ |      3 |     Thomas |     Brown |      3 |         2 | 
+ +--------+------------+-----------+--------+-----------+
+
+```
 
 ## Lab3 需要实现的接口
 
