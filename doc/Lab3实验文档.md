@@ -43,7 +43,7 @@ make
 
 ## Lab3 样例
 
-JOIN的两个表
+两个表的JOIN示例
 ```sh
 > SELECT * FROM students;
  +--------+------------+-----------+
