@@ -274,7 +274,6 @@ std::pair<std::vector<String>, std::vector<Record *>> Instance::Join(
 
   // ALERT:由于实现临时表存储具有一定难度，所以允许JOIN过程中将中间结果保留在内存中，不需要存入临时表
   // ALERT:为了方便同学们实现，我们保证进行JOIN的两列列名相同
-  // ALERT:JOIN的表的数量可能超过2，所以需要先计算一个JOIN执行计划（不要求复杂算法）
   // ALERT:针对于不同的JOIN情况（此处只需要考虑数据量和是否为索引列），可以选择使用不同的JOIN算法
   // ALERT:部分测试点数据量较大，不经过优化的NestedLoopJoin算法可能无法通过全部测试样例
   // ALERT:JOIN前已经经过了Filter过程
@@ -287,6 +286,8 @@ std::pair<std::vector<String>, std::vector<Record *>> Instance::Join(
   // TIPS:利用IsIndex可以判断列是否存在索引
   // TIPS:利用GetIndex可以获得索引Index*指针
   // TIPS:在多表JOIN时，可以采用并查集或执行树来确定执行JOIN的数据内容
+
+  // EXTRA:JOIN的表的数量超过2时，所以需要先计算一个JOIN执行计划（不要求复杂算法）,有兴趣的同学可以自行实现
 
   // LAB3 END
 }
