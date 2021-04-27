@@ -98,6 +98,9 @@ bool IndexManager::HasIndex(const String &sTableName) const {
 }
 
 void IndexManager::Store() {
+  // Update Index Root
+  for (const auto &iPair : _iIndexMap)
+    _iIndexIDMap[iPair.first] = iPair.second->GetRootID();
   RecordPage *pPage = new RecordPage(INDEX_MANAGER_PAGEID);
   pPage->Clear();
   FixedRecord *pRecord = new FixedRecord(
