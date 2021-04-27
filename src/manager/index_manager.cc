@@ -68,6 +68,7 @@ void IndexManager::DropIndex(const String &sTableName, const String &sColName) {
   if (!IsIndex(sTableName, sColName)) throw IndexException();
   String sIndexName = GetIndexName(sTableName, sColName);
   Index *pIndex = GetIndex(sTableName, sColName);
+  _iIndexIDMap[sIndexName] = pIndex->GetRootID();
   pIndex->Clear();
   delete pIndex;
   PageID nRoot = _iIndexIDMap[sIndexName];
