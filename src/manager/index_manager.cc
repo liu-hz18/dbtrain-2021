@@ -68,11 +68,8 @@ void IndexManager::DropIndex(const String &sTableName, const String &sColName) {
   if (!IsIndex(sTableName, sColName)) throw IndexException();
   String sIndexName = GetIndexName(sTableName, sColName);
   Index *pIndex = GetIndex(sTableName, sColName);
-  _iIndexIDMap[sIndexName] = pIndex->GetRootID();
   pIndex->Clear();
   delete pIndex;
-  PageID nRoot = _iIndexIDMap[sIndexName];
-  MiniOS::GetOS()->DeletePage(nRoot);
   _iIndexIDMap.erase(sIndexName);
   _iIndexMap.erase(sIndexName);
   assert(_iTableIndexes.find(sTableName) != _iTableIndexes.end());
