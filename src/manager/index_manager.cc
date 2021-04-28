@@ -70,9 +70,6 @@ void IndexManager::DropIndex(const String &sTableName, const String &sColName) {
   Index *pIndex = GetIndex(sTableName, sColName);
   pIndex->Clear();
   delete pIndex;
-  PageID nRoot = _iIndexIDMap[sIndexName];
-  assert(!MiniOS::GetOS()->Used(nRoot));
-  // MiniOS::GetOS()->DeletePage(nRoot);
   _iIndexIDMap.erase(sIndexName);
   _iIndexMap.erase(sIndexName);
   assert(_iTableIndexes.find(sTableName) != _iTableIndexes.end());
@@ -99,6 +96,9 @@ bool IndexManager::HasIndex(const String &sTableName) const {
 }
 
 void IndexManager::Store() {
+  // Update Index Root
+  for (const auto &iPair : _iIndexMap)
+    _iIndexIDMap[iPair.first] = iPair.second->GetRootID();
   RecordPage *pPage = new RecordPage(INDEX_MANAGER_PAGEID);
   pPage->Clear();
   FixedRecord *pRecord = new FixedRecord(
