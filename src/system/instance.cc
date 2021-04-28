@@ -266,4 +266,30 @@ bool Instance::DropIndex(const String &sTableName, const String &sColName) {
   return true;
 }
 
+std::pair<std::vector<String>, std::vector<Record *>> Instance::Join(
+    std::map<String, std::vector<PageSlotID>> &iResultMap,
+    std::vector<Condition *> &iJoinConds) {
+  // LAB3 BEGIN
+  // TODO:实现正确且高效的表之间JOIN过程
+
+  // ALERT:由于实现临时表存储具有一定难度，所以允许JOIN过程中将中间结果保留在内存中，不需要存入临时表
+  // ALERT:一定要注意，存在JOIN字段值相同的情况，需要特别重视
+  // ALERT:针对于不同的JOIN情况（此处只需要考虑数据量和是否为索引列），可以选择使用不同的JOIN算法
+  // ALERT:JOIN前已经经过了Filter过程
+  // ALERT:建议不要使用不经过优化的NestedLoopJoin算法
+
+  // TIPS:JoinCondition中保存了JOIN两方的表名和列名
+  // TIPS:利用GetTable(TableName)的方式可以获得Table*指针，之后利用lab1中的Table::GetRecord获得初始Record*数据
+  // TIPs:利用Table::GetColumnNames可以获得Table初始的列名，与初始Record*顺序一致
+  // TIPS:Record对象添加了Copy,Sub,Add,Remove函数，方便同学们对于Record进行处理
+  // TIPS:利用GetColID/Type/Size三个函数可以基于表名和列名获得列的信息
+  // TIPS:利用IsIndex可以判断列是否存在索引
+  // TIPS:利用GetIndex可以获得索引Index*指针
+
+  // EXTRA:JOIN的表的数量超过2时，所以需要先计算一个JOIN执行计划（不要求复杂算法）,有兴趣的同学可以自行实现
+  // EXTRA:在多表JOIN时，可以采用并查集或执行树来确定执行JOIN的数据内容
+
+  // LAB3 END
+}
+
 }  // namespace thdb

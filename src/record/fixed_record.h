@@ -36,7 +36,11 @@ class FixedRecord : public Record {
    */
   void Build(const std::vector<String> &iRawVec) override;
 
-  void UpdateRaw(uint8_t* dst, const std::vector<Transform> &iTrans);
+  Record *Copy() const override;
+
+  void Sub(const std::vector<Size> &iPos) override;
+  void Add(Record *pRecord) override;
+  void Remove(FieldID nPos) override;
 
  private:
   /**

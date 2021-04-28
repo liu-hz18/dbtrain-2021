@@ -24,6 +24,23 @@ class Record {
   virtual Size Load(const uint8_t *src) = 0;
   virtual Size Store(uint8_t *dst) const = 0;
   virtual void Build(const std::vector<String> &iRawVec) = 0;
+  /**
+   * @brief 记录的深拷贝
+   */
+  virtual Record *Copy() const = 0;
+
+  /**
+   * @brief 截取Record的部分字段
+   */
+  virtual void Sub(const std::vector<Size> &iPos);
+  /**
+   * @brief 向Record后添加部分字段
+   */
+  virtual void Add(Record *pRecord);
+  /**
+   * @brief 删除Record中一个字段
+   */
+  virtual void Remove(FieldID nPos);
 
   void Clear(); // _iFields 置 nullptr
   String ToString();
