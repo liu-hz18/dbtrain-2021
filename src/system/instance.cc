@@ -1,16 +1,22 @@
 #include "system/instance.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
 
+#include <vector>
+#include <unordered_map>
 #include <algorithm>
 #include <iostream>
 
 #include "condition/conditions.h"
 #include "exception/exceptions.h"
 #include "manager/table_manager.h"
+#include "page/record_page.h"
+#include "record/record.h"
 #include "record/fixed_record.h"
+
+using namespace std;
 
 namespace thdb {
 
@@ -264,6 +270,155 @@ bool Instance::DropIndex(const String &sTableName, const String &sColName) {
   }
   _pIndexManager->DropIndex(sTableName, sColName);
   return true;
+}
+
+std::pair<std::vector<String>, std::vector<Record *>> Instance::Join(
+    std::map<String, std::vector<PageSlotID>> &iResultMap,
+    std::vector<Condition *> &iJoinConds) {
+  // LAB3 BEGIN
+  // TODO:实现正确且高效的表之间JOIN过程
+
+  // ALERT:由于实现临时表存储具有一定难度，所以允许JOIN过程中将中间结果保留在内存中，不需要存入临时表
+  // ALERT:一定要注意，存在JOIN字段值相同的情况，需要特别重视
+  // ALERT:针对于不同的JOIN情况（此处只需要考虑数据量和是否为索引列），可以选择使用不同的JOIN算法
+  // ALERT:JOIN前已经经过了Filter过程
+  // ALERT:建议不要使用不经过优化的NestedLoopJoin算法
+
+  // TIPS:JoinCondition中保存了JOIN两方的表名和列名
+  // TIPS:利用GetTable(TableName)的方式可以获得Table*指针，之后利用lab1中的Table::GetRecord获得初始Record*数据
+  // TIPs:利用Table::GetColumnNames可以获得Table初始的列名，与初始Record*顺序一致
+  // TIPS:Record对象添加了Copy,Sub,Add,Remove函数，方便同学们对于Record进行处理
+  // TIPS:利用GetColID/Type/Size三个函数可以基于表名和列名获得列的信息
+  // TIPS:利用IsIndex可以判断列是否存在索引
+  // TIPS:利用GetIndex可以获得索引Index*指针
+
+  // EXTRA:JOIN的表的数量超过2时，所以需要先计算一个JOIN执行计划（不要求复杂算法）,有兴趣的同学可以自行实现
+  // EXTRA:在多表JOIN时，可以采用并查集或执行树来确定执行JOIN的数据内容
+
+  // implemented Sort-Merge Algorithm.
+  // 初始化两个表的Record*向量
+  // cout << "begin" << endl;
+  const String tableName1 = iResultMap.cbegin()->first;
+  std::vector<PageSlotID> pageslots1 = iResultMap.cbegin()->second;
+  Table *pTable1 = GetTable(tableName1);
+  std::vector<String> columnNames1 = pTable1->GetColumnNames();
+  std::vector<Record *> records1;
+  // record page cache
+  RecordPage* last_record_page = nullptr;
+  PageID last_page_id = -1;
+  for (const auto& pageslot: pageslots1) {
+    Record* fixed_record = pTable1->EmptyRecord();
+    uint8_t* raw_slot_data;
+    if (pageslot.first != last_page_id) {
+      if (last_record_page != nullptr) delete last_record_page;
+      last_record_page = new RecordPage(pageslot.first);
+      last_page_id = pageslot.first;
+    }
+    raw_slot_data = last_record_page->GetRecord(pageslot.second);
+    fixed_record->Load(raw_slot_data);
+    delete[] raw_slot_data;
+    records1.emplace_back(fixed_record);
+  }
+
+  const String tableName2 = iResultMap.crbegin()->first;
+  std::vector<PageSlotID> pageslots2 = iResultMap.crbegin()->second;
+  Table *pTable2 = GetTable(tableName2);
+  std::vector<String> columnNames2 = pTable2->GetColumnNames();
+  std::vector<Record *> records2;
+  // record page cache
+  last_record_page = nullptr;
+  last_page_id = -1;
+  for (const auto& pageslot: pageslots2) {
+    Record* fixed_record = pTable2->EmptyRecord();
+    uint8_t* raw_slot_data;
+    if (pageslot.first != last_page_id) {
+      if (last_record_page != nullptr) delete last_record_page;
+      last_record_page = new RecordPage(pageslot.first);
+      last_page_id = pageslot.first;
+    }
+    raw_slot_data = last_record_page->GetRecord(pageslot.second);
+    fixed_record->Load(raw_slot_data);
+    delete[] raw_slot_data;
+    records2.emplace_back(fixed_record);
+  }
+
+  // get join condition
+  JoinCondition* condition = dynamic_cast<JoinCondition*>(iJoinConds[0]); // we only select one for simplification.
+  assert(condition != nullptr);
+  String joinCol1, joinCol2;
+  if (condition->sTableA == tableName1) {
+    joinCol1 = condition->sColA; joinCol2 = condition->sColB;
+  } else {
+    joinCol1 = condition->sColB; joinCol2 = condition->sColA;
+  }
+  uint32_t joinColRank1 = pTable1->GetPos(joinCol1);
+  uint32_t joinColRank2 = pTable2->GetPos(joinCol2);
+  FieldType type = pTable1->GetType(joinCol1);
+  assert(type == pTable2->GetType(joinCol2));
+
+  std::vector<Record *> resultRecords;
+  std::vector<String> resultColNames = columnNames1;
+  resultColNames.insert(resultColNames.end(), columnNames2.begin(), columnNames2.end());
+
+  // use dynamic join algo.
+  if (pageslots1.size() < 1024 && pageslots2.size() < 1024) { // use sort merge join, O(m + n + mlogm + nlogn)
+    // sort
+    sort(records1.begin(), records1.end(), [=](Record* left, Record* right){
+      return Less(left->_iFields[joinColRank1], right->_iFields[joinColRank1], type);
+    });
+    sort(records2.begin(), records2.end(), [=](Record* left, Record* right){
+      return Less(left->_iFields[joinColRank2], right->_iFields[joinColRank2], type);
+    });
+    // merge
+    size_t last_j = 0;
+    for (size_t i = 0; i < records1.size(); ++i) {
+      size_t j;
+      for (j = last_j; j < records2.size(); ++j) {
+        if (Equal(records1[i]->_iFields[joinColRank1], records2[j]->_iFields[joinColRank2], type)) {
+          Record* hitRecord = records1[i]->Copy();
+          hitRecord->Add(records2[j]);
+          resultRecords.emplace_back(hitRecord);
+        } else {
+          break;
+        }
+      }
+      if (i < records1.size()-1 && !Equal(records1[i]->_iFields[joinColRank1], records1[i+1]->_iFields[joinColRank1], type)) {
+        last_j = j;
+      }
+    }
+  } else { // use hash join O(m+n)
+    // hash O(m)
+    std::unordered_map<int, std::vector<Record*>> hashmap;
+    for (auto* record: records1) {
+      IntField* field = dynamic_cast<IntField*>(record->_iFields[joinColRank1]);
+      if (hashmap.count(field->GetIntData()) > 0) {
+        hashmap[field->GetIntData()].emplace_back(record);
+      } else {
+        hashmap.insert({field->GetIntData(), std::vector<Record*>{record}});
+      }
+    }
+    // iteration, O(n)
+    for (auto* record: records2) {
+      IntField* field = dynamic_cast<IntField*>(record->_iFields[joinColRank2]);
+      if (hashmap.count(field->GetIntData()) > 0) {
+        for (auto* record1: hashmap[field->GetIntData()]) {
+          Record* hitRecord = record1->Copy();
+          hitRecord->Add(record);
+          resultRecords.emplace_back(hitRecord);
+        }
+      }
+    }
+  }
+
+  for (size_t i = 0; i < records1.size(); ++i) {
+    delete records1[i];
+  }
+  for (size_t i = 0; i < records2.size(); ++i) {
+    delete records2[i];
+  }
+
+  return std::pair<std::vector<String>, std::vector<Record*> >(resultColNames, resultRecords);
+  // LAB3 END
 }
 
 }  // namespace thdb
