@@ -8,8 +8,11 @@
 
 namespace thdb {
 
+class Instance;
+
 // 定长记录
 class FixedRecord : public Record {
+  friend class Instance;
  public:
   FixedRecord(Size nFieldSize, const std::vector<FieldType> &iTypeVec,
               const std::vector<Size> &iSizeVec);

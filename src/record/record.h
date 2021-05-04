@@ -7,7 +7,11 @@
 // 表示一条记录的抽象类
 // 用于实现记录序列化和反序列化工作
 namespace thdb {
+
+class Instance;
+
 class Record {
+  friend class Instance;
  public:
   Record();
   Record(Size nFieldSize);
