@@ -6,6 +6,7 @@
 #include "index/index.h"
 #include "manager/index_manager.h"
 #include "manager/table_manager.h"
+#include "manager/transaction_manager.h"
 #include "record/transform.h"
 #include "result/results.h"
 #include "table/schema.h"
@@ -64,6 +65,10 @@ class Instance {
                    FieldType iType);
   bool DropIndex(const String &sTableName, const String &sColName);
 
+  TransactionManager *GetTransactionManager() const {
+    return _pTransactionManager;
+  }
+
   /**
    * @brief 实现多个表的JOIN操作
    *
@@ -80,6 +85,7 @@ class Instance {
  private:
   TableManager *_pTableManager;
   IndexManager *_pIndexManager;
+  TransactionManager *_pTransactionManager;
 };
 
 }  // namespace thdb

@@ -40,8 +40,12 @@ Record *Table::GetRecord(PageID nPageID, SlotID nSlotID) {
   // LAB1 END
 }
 
+<<<<<<< HEAD
 PageSlotID Table::InsertRecord(Record *pRecord) {
   return std::pair<PageID, SlotID>();  // 开始实验时删除此行
+=======
+PageSlotID Table::InsertRecord(Record *pRecord, Transaction *txn) {
+>>>>>>> 09603f6 (Add lab4 interfaces)
   // LAB1 BEGIN
   // TODO: 插入一条记录
   // TIPS: 利用_nNotFull来获取有空间的页面
@@ -51,7 +55,7 @@ PageSlotID Table::InsertRecord(Record *pRecord) {
   // LAB1 END
 }
 
-void Table::DeleteRecord(PageID nPageID, SlotID nSlotID) {
+void Table::DeleteRecord(PageID nPageID, SlotID nSlotID, Transaction *txn) {
   // LAB1 BEGIN
   // TIPS: 利用RecordPage::DeleteRecord插入数据
   // TIPS: 注意更新_nNotFull来保证较高的页面空间利用效率
@@ -59,7 +63,8 @@ void Table::DeleteRecord(PageID nPageID, SlotID nSlotID) {
 }
 
 void Table::UpdateRecord(PageID nPageID, SlotID nSlotID,
-                         const std::vector<Transform> &iTrans) {
+                         const std::vector<Transform> &iTrans,
+                         Transaction *txn) {
   // LAB1 BEGIN
   // TIPS: 仿照InsertRecord从无格式数据导入原始记录
   // TIPS: 构建Record对象，利用Record::SetField更新Record对象
@@ -69,7 +74,8 @@ void Table::UpdateRecord(PageID nPageID, SlotID nSlotID,
   // LAB1 END
 }
 
-std::vector<PageSlotID> Table::SearchRecord(Condition *pCond) {
+std::vector<PageSlotID> Table::SearchRecord(Condition *pCond,
+                                            Transaction *txn) {
   return std::vector<PageSlotID>();  // 开始实验时删除此行
   // LAB1 BEGIN
   // TODO: 对记录的条件检索

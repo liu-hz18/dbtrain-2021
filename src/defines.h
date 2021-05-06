@@ -20,6 +20,8 @@ typedef uint32_t Size;
 
 typedef std::pair<PageID, SlotID> PageSlotID;
 
+typedef uint32_t TxnID;
+
 }  // namespace thdb
 
 #endif

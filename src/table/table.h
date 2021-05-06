@@ -7,6 +7,7 @@
 #include "record/record.h"
 #include "record/transform.h"
 #include "table/schema.h"
+#include "transaction/transaction.h"
 
 namespace thdb {
 
@@ -29,14 +30,14 @@ class Table {
    * @param pRecord 待插入数据
    * @return PageSlotID 插入的位置
    */
-  PageSlotID InsertRecord(Record *pRecord);
+  PageSlotID InsertRecord(Record *pRecord, Transaction *txn = nullptr);
   /**
    * @brief 删除一条数据
    *
    * @param nPageID 页编号
    * @param nSlotID 槽编号
    */
-  void DeleteRecord(PageID nPageID, SlotID nSlotID);
+  void DeleteRecord(PageID nPageID, SlotID nSlotID, Transaction *txn = nullptr);
   /**
    * @brief 更新一条数据
    *
@@ -45,14 +46,16 @@ class Table {
    * @param iTrans 更新变化方式
    */
   void UpdateRecord(PageID nPageID, SlotID nSlotID,
-                    const std::vector<Transform> &iTrans);
+                    const std::vector<Transform> &iTrans,
+                    Transaction *txn = nullptr);
   /**
    * @brief 条件检索
    *
    * @param pCond 检索条件
    * @return std::vector<PageSlotID> 符合条件记录的位置
    */
-  std::vector<PageSlotID> SearchRecord(Condition *pCond);
+  std::vector<PageSlotID> SearchRecord(Condition *pCond,
+                                       Transaction *txn = nullptr);
 
   void SearchRecord(std::vector<PageSlotID> &iPairs, Condition *pCond);
   /**
