@@ -17,11 +17,13 @@ namespace thdb {
 Instance::Instance() {
   _pTableManager = new TableManager();
   _pIndexManager = new IndexManager();
+  _pTransactionManager = new TransactionManager();
 }
 
 Instance::~Instance() {
   delete _pTableManager;
   delete _pIndexManager;
+  delete _pTransactionManager;
 }
 
 Table *Instance::GetTable(const String &sTableName) const {
