@@ -29,7 +29,6 @@ Table *Instance::GetTable(const String &sTableName) const {
 }
 
 bool Instance::CreateTable(const String &sTableName, const Schema &iSchema) {
-  // iSchema.AddSystemColumns();
   _pTableManager->AddTable(sTableName, iSchema);
   return true;
 }
