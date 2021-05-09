@@ -30,14 +30,14 @@ class Table {
    * @param pRecord 待插入数据
    * @return PageSlotID 插入的位置
    */
-  PageSlotID InsertRecord(Record *pRecord, Transaction *txn = nullptr);
+  PageSlotID InsertRecord(Record *pRecord);
   /**
    * @brief 删除一条数据
    *
    * @param nPageID 页编号
    * @param nSlotID 槽编号
    */
-  void DeleteRecord(PageID nPageID, SlotID nSlotID, Transaction *txn = nullptr);
+  void DeleteRecord(PageID nPageID, SlotID nSlotID);
   /**
    * @brief 更新一条数据
    *
@@ -46,16 +46,14 @@ class Table {
    * @param iTrans 更新变化方式
    */
   void UpdateRecord(PageID nPageID, SlotID nSlotID,
-                    const std::vector<Transform> &iTrans,
-                    Transaction *txn = nullptr);
+                    const std::vector<Transform> &iTrans);
   /**
    * @brief 条件检索
    *
    * @param pCond 检索条件
    * @return std::vector<PageSlotID> 符合条件记录的位置
    */
-  std::vector<PageSlotID> SearchRecord(Condition *pCond,
-                                       Transaction *txn = nullptr);
+  std::vector<PageSlotID> SearchRecord(Condition *pCond);
 
   void SearchRecord(std::vector<PageSlotID> &iPairs, Condition *pCond);
   /**
