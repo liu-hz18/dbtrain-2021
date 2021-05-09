@@ -29,6 +29,7 @@ Table *Instance::GetTable(const String &sTableName) const {
 }
 
 bool Instance::CreateTable(const String &sTableName, const Schema &iSchema) {
+  // iSchema.AddSystemColumns();
   _pTableManager->AddTable(sTableName, iSchema);
   return true;
 }
@@ -78,7 +79,7 @@ std::vector<PageSlotID> Intersection(std::vector<PageSlotID> iA,
 
 std::vector<PageSlotID> Instance::Search(
     const String &sTableName, Condition *pCond,
-    const std::vector<Condition *> &iIndexCond) {
+    const std::vector<Condition *> &iIndexCond, const Transaction *txn) {
   Table *pTable = GetTable(sTableName);
   if (pTable == nullptr) throw TableException();
   if (iIndexCond.size() > 0) {
@@ -102,7 +103,8 @@ std::vector<PageSlotID> Instance::Search(
 }
 
 PageSlotID Instance::Insert(const String &sTableName,
-                            const std::vector<String> &iRawVec) {
+                            const std::vector<String> &iRawVec,
+                            const Transaction *txn) {
   Table *pTable = GetTable(sTableName);
   if (pTable == nullptr) throw TableException();
   Record *pRecord = pTable->EmptyRecord();
@@ -123,7 +125,8 @@ PageSlotID Instance::Insert(const String &sTableName,
 }
 
 uint32_t Instance::Delete(const String &sTableName, Condition *pCond,
-                          const std::vector<Condition *> &iIndexCond) {
+                          const std::vector<Condition *> &iIndexCond,
+                          const Transaction *txn) {
   auto iResVec = Search(sTableName, pCond, iIndexCond);
   Table *pTable = GetTable(sTableName);
   bool bHasIndex = _pIndexManager->HasIndex(sTableName);
@@ -147,7 +150,8 @@ uint32_t Instance::Delete(const String &sTableName, Condition *pCond,
 
 uint32_t Instance::Update(const String &sTableName, Condition *pCond,
                           const std::vector<Condition *> &iIndexCond,
-                          const std::vector<Transform> &iTrans) {
+                          const std::vector<Transform> &iTrans,
+                          const Transaction *txn) {
   auto iResVec = Search(sTableName, pCond, iIndexCond);
   Table *pTable = GetTable(sTableName);
   bool bHasIndex = _pIndexManager->HasIndex(sTableName);
