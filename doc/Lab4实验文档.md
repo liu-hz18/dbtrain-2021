@@ -11,7 +11,7 @@
 - 新增类：TransactionManager, Transaction
 - 接口修改：
   - Instance 类的 InsertRecord, DeleteRecord, UpdateRecord, SearchRecord, GetRecord 接口增加一个传入参数 Transaction *txn，表示进行当前操作的事务，同时为了不影响前 3 次实验，为该参数添加默认值 nullptr。
-  - Instance 类的 CreateTable 函数增加传入参数 useTxn，默认值为 false，表示创建table 时是否需要考虑事务。
+  - Instance 类的 CreateTable 函数增加传入参数 useTxn，默认值为 false，表示创建 table 时是否需要考虑事务。
 
 ## Lab4 需要实现的接口
 
@@ -29,11 +29,11 @@
 
 由于目前实验框架没有加入对多线程的支持，因此测试采取单线程模拟多事务的方式进行，具体可参考测试仓库代码及注释。
 
-至少需通过 Insert 相关测试，包括 CommitInsert1, CommitInsert2, AbortInsert1, AbortInsert2 四个测试函数。此外，我们提供了 Update 和 Delete 接口的测试函数，默认为 DISABLED 状态，感兴趣的同学可自行测试。
+**至少需通过 Insert 相关测试**，包括 CommitInsert1, CommitInsert2, AbortInsert1, AbortInsert2 四个测试函数。此外，我们提供了 Update 和 Delete 接口的测试函数，默认为 DISABLED 状态，感兴趣的同学可自行测试。
 
 ## 参考实现思路
 
-MVCC 有多种实现机制，不同数据库对 MVCC 的实现也不尽相同，下面给出一种可以通过本实验测试的实现思路供参考，该实现不是最优的，感兴趣的同学可以尝试其他实现方案。
+MVCC 有多种实现机制，不同数据库对 MVCC 的实现也不尽相同，下面给出一种可以通过 Insert 测试的参考实现思路，该实现不是最优的，感兴趣的同学可以尝试其他实现方案。
 
 首先我们需要记录插入的每一条 record 属于哪个事务，在 Instance 类的 CreateTable 函数中，若参数 useTxn 为 true，可以在创建表时增加一列，用于记录创建该 record 的事务 id。对于 Insert 函数，若参数 txn 不是空指针，则需要为记录添加一个 Field，表示当前事务 id。而 GetRecord 函数在返回记录时，也需要将事务 id 列删除。
 
@@ -41,9 +41,13 @@ MVCC 有多种实现机制，不同数据库对 MVCC 的实现也不尽相同，
 
 最后，为实现 Abort 功能，可以在 Transaction 中维护一个 WriteRecord 队列，记录该事务进行过的修改，事务 Abort 后，通过该队列将事务所作的修改恢复。
 
+若要加入
+
 ## Lab4 报告说明
 
-在本次实验报告中说明你的 MVCC 实现方案，遇到的难点和关键点，若采用了文档中的参考实现方案，可以分析一下本方案存在的问题和优缺点。
+在本次实验报告中说明你的 MVCC 实现方案，遇到的难点和关键点。
+
+（选做）感兴趣的同学可以调研一下开源数据库（如 MySQL, PostgreSQL 等）的 MVCC 实现机制。
 
 ## Lab4 截止时间
 
