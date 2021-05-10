@@ -7,7 +7,6 @@
 #include "record/record.h"
 #include "record/transform.h"
 #include "table/schema.h"
-#include "transaction/transaction.h"
 
 namespace thdb {
 
