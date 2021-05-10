@@ -31,7 +31,7 @@ Table *Instance::GetTable(const String &sTableName) const {
 }
 
 bool Instance::CreateTable(const String &sTableName, const Schema &iSchema,
-                           bool useTxn = false) {
+                           bool useTxn) {
   _pTableManager->AddTable(sTableName, iSchema);
   return true;
 }
