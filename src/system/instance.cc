@@ -30,7 +30,8 @@ Table *Instance::GetTable(const String &sTableName) const {
   return _pTableManager->GetTable(sTableName);
 }
 
-bool Instance::CreateTable(const String &sTableName, const Schema &iSchema) {
+bool Instance::CreateTable(const String &sTableName, const Schema &iSchema,
+                           bool useTxn = false) {
   _pTableManager->AddTable(sTableName, iSchema);
   return true;
 }
@@ -186,8 +187,8 @@ uint32_t Instance::Update(const String &sTableName, Condition *pCond,
   return iResVec.size();
 }
 
-Record *Instance::GetRecord(const String &sTableName,
-                            const PageSlotID &iPair) const {
+Record *Instance::GetRecord(const String &sTableName, const PageSlotID &iPair,
+                            const Transaction *txn) const {
   Table *pTable = GetTable(sTableName);
   return pTable->GetRecord(iPair.first, iPair.second);
 }

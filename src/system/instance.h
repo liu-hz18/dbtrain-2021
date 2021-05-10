@@ -18,7 +18,8 @@ class Instance {
   Instance();
   ~Instance();
 
-  bool CreateTable(const String &sTableName, const Schema &iSchema);
+  bool CreateTable(const String &sTableName, const Schema &iSchema,
+                   bool useTxn = false);
   bool DropTable(const String &sTableName);
   /**
    * @brief 获得列在表中的位置信息
@@ -47,7 +48,8 @@ class Instance {
                     const std::vector<String> &iRawVec,
                     const Transaction *txn = nullptr);
 
-  Record *GetRecord(const String &sTableName, const PageSlotID &iPair) const;
+  Record *GetRecord(const String &sTableName, const PageSlotID &iPair,
+                    const Transaction *txn = nullptr) const;
   std::vector<Record *> GetTableInfos(const String &sTableName) const;
   std::vector<String> GetTableNames() const;
   std::vector<String> GetColumnNames(const String &sTableName) const;

@@ -16,9 +16,6 @@ class TransactionManager {
   Transaction *Begin();
   void Commit(Transaction *txn);
   void Abort(Transaction *txn);
-
- private:
-  std::unordered_map<TxnID, Transaction *> txn_map;
 };
 
 }  // namespace thdb
