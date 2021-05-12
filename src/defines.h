@@ -21,6 +21,8 @@ typedef int32_t Rank;
 
 typedef std::pair<PageID, SlotID> PageSlotID;
 
+typedef uint32_t TxnID;
+
 }  // namespace thdb
 
 #endif

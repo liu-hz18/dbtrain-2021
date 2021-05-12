@@ -10,7 +10,6 @@
 
 namespace thdb {
 
-// 表示一张表，实现各种记录的操作函数
 class Table {
  public:
   Table(PageID nTableID);
