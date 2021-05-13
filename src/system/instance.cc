@@ -81,7 +81,7 @@ std::vector<PageSlotID> Intersection(std::vector<PageSlotID> iA,
 
 std::vector<PageSlotID> Instance::Search(
     const String &sTableName, Condition *pCond,
-    const std::vector<Condition *> &iIndexCond, const Transaction *txn) {
+    const std::vector<Condition *> &iIndexCond, Transaction *txn) {
   Table *pTable = GetTable(sTableName);
   if (pTable == nullptr) throw TableException();
   if (iIndexCond.size() > 0) {
@@ -106,7 +106,7 @@ std::vector<PageSlotID> Instance::Search(
 
 PageSlotID Instance::Insert(const String &sTableName,
                             const std::vector<String> &iRawVec,
-                            const Transaction *txn) {
+                            Transaction *txn) {
   Table *pTable = GetTable(sTableName);
   if (pTable == nullptr) throw TableException();
   Record *pRecord = pTable->EmptyRecord();
@@ -128,7 +128,7 @@ PageSlotID Instance::Insert(const String &sTableName,
 
 uint32_t Instance::Delete(const String &sTableName, Condition *pCond,
                           const std::vector<Condition *> &iIndexCond,
-                          const Transaction *txn) {
+                          Transaction *txn) {
   auto iResVec = Search(sTableName, pCond, iIndexCond);
   Table *pTable = GetTable(sTableName);
   bool bHasIndex = _pIndexManager->HasIndex(sTableName);
@@ -153,7 +153,7 @@ uint32_t Instance::Delete(const String &sTableName, Condition *pCond,
 uint32_t Instance::Update(const String &sTableName, Condition *pCond,
                           const std::vector<Condition *> &iIndexCond,
                           const std::vector<Transform> &iTrans,
-                          const Transaction *txn) {
+                          Transaction *txn) {
   auto iResVec = Search(sTableName, pCond, iIndexCond);
   Table *pTable = GetTable(sTableName);
   bool bHasIndex = _pIndexManager->HasIndex(sTableName);
@@ -188,7 +188,7 @@ uint32_t Instance::Update(const String &sTableName, Condition *pCond,
 }
 
 Record *Instance::GetRecord(const String &sTableName, const PageSlotID &iPair,
-                            const Transaction *txn) const {
+                            Transaction *txn) const {
   Table *pTable = GetTable(sTableName);
   return pTable->GetRecord(iPair.first, iPair.second);
 }

@@ -36,20 +36,20 @@ class Instance {
 
   std::vector<PageSlotID> Search(const String &sTableName, Condition *pCond,
                                  const std::vector<Condition *> &iIndexCond,
-                                 const Transaction *txn = nullptr);
+                                 Transaction *txn = nullptr);
   uint32_t Delete(const String &sTableName, Condition *pCond,
                   const std::vector<Condition *> &iIndexCond,
-                  const Transaction *txn = nullptr);
+                  Transaction *txn = nullptr);
   uint32_t Update(const String &sTableName, Condition *pCond,
                   const std::vector<Condition *> &iIndexCond,
                   const std::vector<Transform> &iTrans,
-                  const Transaction *txn = nullptr);
+                  Transaction *txn = nullptr);
   PageSlotID Insert(const String &sTableName,
                     const std::vector<String> &iRawVec,
-                    const Transaction *txn = nullptr);
+                    Transaction *txn = nullptr);
 
   Record *GetRecord(const String &sTableName, const PageSlotID &iPair,
-                    const Transaction *txn = nullptr) const;
+                    Transaction *txn = nullptr) const;
   std::vector<Record *> GetTableInfos(const String &sTableName) const;
   std::vector<String> GetTableNames() const;
   std::vector<String> GetColumnNames(const String &sTableName) const;
