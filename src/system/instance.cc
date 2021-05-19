@@ -144,7 +144,7 @@ PageSlotID Instance::Insert(const String &sTableName,
       _pIndexManager->GetIndex(sTableName, sCol)->Insert(pKey, iPair);
     }
   }
-  txn->recordInsert(iPair);
+  if (txn != nullptr) txn->recordInsert(iPair);
   delete pRecord;
   return iPair;
 }
