@@ -7,7 +7,6 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
-#include <iostream>
 
 #include "condition/conditions.h"
 #include "exception/exceptions.h"
@@ -38,7 +37,18 @@ Table *Instance::GetTable(const String &sTableName) const {
 
 bool Instance::CreateTable(const String &sTableName, const Schema &iSchema,
                            bool useTxn) {
-  _pTableManager->AddTable(sTableName, iSchema);
+  // 如果useTxn，那么在Schema的最后添加一列Txn, uint32类型
+  if (useTxn) {
+    // copy
+    std::vector<Column> _iColVec;
+    for (size_t i = 0; i < iSchema.GetSize(); ++i) {
+      _iColVec.push_back(iSchema.GetColumn(i));
+    }
+    _iColVec.push_back(Column("_txn_id", FieldType::INT_TYPE, 4));
+    _pTableManager->AddTable(sTableName, Schema(_iColVec));
+  } else {
+    _pTableManager->AddTable(sTableName, iSchema);
+  }
   return true;
 }
 
@@ -107,16 +117,23 @@ std::vector<PageSlotID> Instance::Search(
     }
     return iRes;
   } else
-    return pTable->SearchRecord(pCond);
+    return pTable->SearchRecord(pCond, txn);
 }
 
 PageSlotID Instance::Insert(const String &sTableName,
                             const std::vector<String> &iRawVec,
-                            const Transaction *txn) {
+                            Transaction *txn) {
   Table *pTable = GetTable(sTableName);
   if (pTable == nullptr) throw TableException();
   Record *pRecord = pTable->EmptyRecord();
-  pRecord->Build(iRawVec);
+  if (txn == nullptr) {
+    pRecord->Build(iRawVec);
+  } else {
+    txn->setTableID(pTable->GetPageID());
+    std::vector<String> newRawVec = iRawVec; // insert txn id
+    newRawVec.push_back(std::to_string(txn->GetTxnID()));
+    pRecord->Build(newRawVec);
+  }
   PageSlotID iPair = pTable->InsertRecord(pRecord);
   // Handle Insert on Index
   if (_pIndexManager->HasIndex(sTableName)) {
@@ -127,7 +144,7 @@ PageSlotID Instance::Insert(const String &sTableName,
       _pIndexManager->GetIndex(sTableName, sCol)->Insert(pKey, iPair);
     }
   }
-
+  txn->recordInsert(iPair);
   delete pRecord;
   return iPair;
 }
@@ -196,7 +213,11 @@ uint32_t Instance::Update(const String &sTableName, Condition *pCond,
 Record *Instance::GetRecord(const String &sTableName, const PageSlotID &iPair,
                             const Transaction *txn) const {
   Table *pTable = GetTable(sTableName);
-  return pTable->GetRecord(iPair.first, iPair.second);
+  Record *pRecord = pTable->GetRecord(iPair.first, iPair.second);
+  if (txn != nullptr) {
+    pRecord->Remove(pRecord->GetSize()-1);
+  }
+  return pRecord;
 }
 
 std::vector<Record *> Instance::GetTableInfos(const String &sTableName) const {

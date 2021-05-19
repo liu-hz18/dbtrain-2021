@@ -2,8 +2,6 @@
 
 #include <assert.h>
 #include <algorithm>
-#include <iostream>
-using namespace std;
 
 #include "exception/exceptions.h"
 #include "field/fields.h"

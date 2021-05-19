@@ -7,6 +7,7 @@
 #include "record/record.h"
 #include "record/transform.h"
 #include "table/schema.h"
+#include "transaction/transaction.h"
 
 namespace thdb {
 
@@ -52,7 +53,7 @@ class Table {
    * @param pCond 检索条件
    * @return std::vector<PageSlotID> 符合条件记录的位置
    */
-  std::vector<PageSlotID> SearchRecord(Condition *pCond);
+  std::vector<PageSlotID> SearchRecord(Condition *pCond, const Transaction *txn=nullptr);
 
   void SearchRecord(std::vector<PageSlotID> &iPairs, Condition *pCond);
   /**
@@ -72,6 +73,7 @@ class Table {
   Record *EmptyRecord() const;
 
   std::vector<String> GetColumnNames() const;
+  PageID GetPageID() const;
 
  private:
   TablePage *pTable;

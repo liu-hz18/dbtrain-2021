@@ -43,7 +43,7 @@ MVCC 有多种实现机制，不同数据库对 MVCC 的实现也不尽相同，
 
 下一步，在通过 Search 函数查找记录时，需要根据当前事务 id， record 中的事务 id，以及当前事务开始时的活跃事务来判断该记录是否可见。要实现该功能，可以在 TransactionManager 中维护一个当前活跃事务列表（即 Begin 之后还没有 Commit 或 Abort 的事务列表），调用 Begin 新建事务时，将该活跃事务列表存入新建的 Transaction 对象中。
 
-最后，为实现 Abort 功能，可以在 Transaction 中维护一个 WriteRecord 队列，记录该事务进行过的修改，事务 Abort 后，通过该队列将事务所作的修改恢复。
+最后，为实现 Abort 功能，可以在 Transaction 中维护一个 WriteRecord 队列，记录该事务进行过的修改，事务 Abort 后，通过该队列将事务所作的修改恢复。（栈？）
 
 ## Lab4 报告说明
 

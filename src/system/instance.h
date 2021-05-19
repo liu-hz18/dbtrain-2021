@@ -46,7 +46,7 @@ class Instance {
                   const Transaction *txn = nullptr);
   PageSlotID Insert(const String &sTableName,
                     const std::vector<String> &iRawVec,
-                    const Transaction *txn = nullptr);
+                    Transaction *txn = nullptr);
 
   Record *GetRecord(const String &sTableName, const PageSlotID &iPair,
                     const Transaction *txn = nullptr) const;

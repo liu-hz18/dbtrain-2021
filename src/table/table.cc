@@ -1,8 +1,6 @@
 #include "table/table.h"
 
-#include <assert.h>
-#include <iostream>
-using namespace std;
+#include <cassert>
 #include <algorithm>
 
 #include "macros.h"
@@ -30,6 +28,10 @@ Table::Table(PageID nTableID) {
 }
 
 Table::~Table() { delete pTable; }
+
+PageID Table::GetPageID() const {
+  return pTable->GetPageID();
+}
 
 Record *Table::GetRecord(PageID nPageID, SlotID nSlotID) {
   // LAB1 BEGIN
@@ -120,7 +122,7 @@ void Table::UpdateRecord(PageID nPageID, SlotID nSlotID,
   // LAB1 END
 }
 
-std::vector<PageSlotID> Table::SearchRecord(Condition *pCond) {
+std::vector<PageSlotID> Table::SearchRecord(Condition *pCond, const Transaction *txn) {
   // LAB1 BEGIN
   // 对记录的条件检索
   // TIPS: 仿照InsertRecord从无格式数据导入原始记录
@@ -141,7 +143,14 @@ std::vector<PageSlotID> Table::SearchRecord(Condition *pCond) {
         Size size = fixed_record->Load(raw_slot_data);
         delete[] raw_slot_data;
         // nullptr, 表示查找该表的所有记录
-        if (pCond == nullptr || pCond->Match(*fixed_record)) {
+        if (txn != nullptr) {
+          Size columnNumber = fixed_record->GetSize();
+          IntField* txn_field = dynamic_cast<IntField*>(fixed_record->GetField(columnNumber-1));
+          TxnID rowTxnID = uint32_t(txn_field->GetIntData());
+          if (txn->visible(rowTxnID) && (pCond == nullptr || pCond->Match(*fixed_record))) {
+            result.push_back(std::pair<PageID, SlotID>(nPageID, i));
+          }
+        } else if (pCond == nullptr || pCond->Match(*fixed_record)) {
           result.push_back(std::pair<PageID, SlotID>(nPageID, i));
         }
         delete fixed_record;

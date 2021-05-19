@@ -5,9 +5,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <iostream>
-using namespace std;
-
 namespace thdb {
 
 const PageOffset NODE_TYPE_OFFSET = 4;

@@ -1,9 +1,6 @@
 #include "record_page.h"
 
-#include <assert.h>
-#include <iostream>
-using namespace std;
-
+#include <cassert>
 #include <cstring>
 
 #include "exception/exceptions.h"

@@ -9,13 +9,18 @@
 namespace thdb {
 
 class TransactionManager {
- public:
+public:
   TransactionManager() = default;
   ~TransactionManager() = default;
 
   Transaction *Begin();
   void Commit(Transaction *txn);
   void Abort(Transaction *txn);
+
+private:
+  std::vector<TxnID> activeTxns;
+  TxnID nextTxnID = 0;
+
 };
 
 }  // namespace thdb
