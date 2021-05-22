@@ -5,6 +5,7 @@
 #include "field/fields.h"
 #include "index/index.h"
 #include "manager/index_manager.h"
+#include "manager/recovery_manager.h"
 #include "manager/table_manager.h"
 #include "manager/transaction_manager.h"
 #include "record/transform.h"
@@ -75,6 +76,8 @@ class Instance {
     return _pTransactionManager;
   }
 
+  RecoveryManager *GetRecoveryManager() const { return _pRecoveryManager; }
+
   /**
    * @brief 实现多个表的JOIN操作
    *
@@ -92,6 +95,7 @@ class Instance {
   TableManager *_pTableManager;
   IndexManager *_pIndexManager;
   TransactionManager *_pTransactionManager;
+  RecoveryManager *_pRecoveryManager;
 };
 
 }  // namespace thdb

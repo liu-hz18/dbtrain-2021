@@ -18,12 +18,14 @@ Instance::Instance() {
   _pTableManager = new TableManager();
   _pIndexManager = new IndexManager();
   _pTransactionManager = new TransactionManager();
+  _pRecoveryManager = new RecoveryManager();
 }
 
 Instance::~Instance() {
   delete _pTableManager;
   delete _pIndexManager;
   delete _pTransactionManager;
+  delete _pRecoveryManager;
 }
 
 Table *Instance::GetTable(const String &sTableName) const {
