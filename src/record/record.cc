@@ -37,7 +37,8 @@ void Record::Sub(const std::vector<Size> &iPos) {
   memset(bInSub, 0, GetSize() * sizeof(bool));
   for (const auto nPos : iPos) bInSub[nPos] = 1;
   auto itField = _iFields.begin();
-  for (Size i = 0; i < GetSize(); ++i) {
+  auto nSize = GetSize();
+  for (Size i = 0; i < nSize; ++i) {
     if (!bInSub[i]) {
       Field *pField = *itField;
       if (pField) delete pField;

@@ -71,7 +71,8 @@ void FixedRecord::Sub(const std::vector<Size> &iPos) {
   auto itField = _iFields.begin();
   auto itType = _iTypeVec.begin();
   auto itSize = _iSizeVec.begin();
-  for (Size i = 0; i < GetSize(); ++i) {
+  auto nSize = GetSize();
+  for (Size i = 0; i < nSize; ++i) {
     if (!bInSub[i]) {
       Field *pField = *itField;
       if (pField) delete pField;
