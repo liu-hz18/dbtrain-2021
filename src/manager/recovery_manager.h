@@ -1,6 +1,8 @@
 #ifndef RECOVERY_MANAGER_H_
 #define RECOVERY_MANAGER_H_
 
+#include "defines.h"
+
 namespace thdb {
 
 class RecoveryManager {
@@ -10,8 +12,10 @@ class RecoveryManager {
 
   void Redo();
   void Undo();
+  void setLogPageID(PageID);
 
  private:
+  PageID _logPageID;
 };
 
 }  // namespace thdb

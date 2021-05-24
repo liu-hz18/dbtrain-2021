@@ -32,6 +32,7 @@ void Init() {
   RecordPage *pNotUsed2 = new RecordPage(256, true);
   RecordPage *pTableManagerPage = new RecordPage(TABLE_NAME_SIZE + 4, true);
   RecordPage *pIndexManagerPage = new RecordPage(128, true);
+  Page* pTxnManagerPage = new Page();
 
   printf("Build Finish.\n");
 
@@ -39,6 +40,7 @@ void Init() {
   delete pNotUsed2;
   delete pTableManagerPage;
   delete pIndexManagerPage;
+  delete pTxnManagerPage;
 
   MiniOS::WriteBack();
 }

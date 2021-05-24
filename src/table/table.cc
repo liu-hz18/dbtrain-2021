@@ -70,6 +70,7 @@ PageSlotID Table::InsertRecord(Record *pRecord) {
   assert(size <= _nFixed);
   SlotID nSlotID = record_page->InsertRecord(raw_slot_data);
   PageID nPageID = _nNotFull;
+  PageSlotID location = std::pair<PageID, SlotID>(nPageID, nSlotID);
   delete[] raw_slot_data;
   // 页满时更新_nNotFull
   bool full = record_page->Full();
@@ -77,7 +78,7 @@ PageSlotID Table::InsertRecord(Record *pRecord) {
   if (full) {
     NextNotFull();
   }
-  return std::pair<PageID, SlotID>(nPageID, nSlotID);
+  return location;
   // LAB1 END
 }
 

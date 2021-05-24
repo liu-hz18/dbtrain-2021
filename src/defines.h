@@ -23,6 +23,16 @@ typedef std::pair<PageID, SlotID> PageSlotID;
 
 typedef uint32_t TxnID;
 
+enum class LogOperation {
+    UNDEFINED = 0,
+    BEGIN = 1,
+    COMMIT = 2,
+    ABORT = 3,
+    INSERT = 4,
+    UPDATE = 5,
+    DELETE = 6
+};
+
 }  // namespace thdb
 
 #endif

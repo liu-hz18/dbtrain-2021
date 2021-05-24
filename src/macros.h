@@ -17,6 +17,7 @@ const Size TABLE_CAPTION = 128;
 const PageID SYSTEM_PAGES = 32;
 const PageID TABLE_MANAGER_PAGEID = 2;
 const PageID INDEX_MANAGER_PAGEID = 3;
+const PageID TXN_MANAGER_PAGEID = 4;
 
 const PageOffset TABLE_NAME_SIZE = 60;
 const PageOffset INDEX_NAME_SIZE = 124;

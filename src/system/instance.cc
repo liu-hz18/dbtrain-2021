@@ -24,6 +24,7 @@ Instance::Instance() {
   _pIndexManager = new IndexManager();
   _pTransactionManager = new TransactionManager();
   _pRecoveryManager = new RecoveryManager();
+  _pRecoveryManager->setLogPageID(_pTransactionManager->getLogPageID());
 }
 
 Instance::~Instance() {
@@ -137,6 +138,7 @@ PageSlotID Instance::Insert(const String &sTableName,
     pRecord->Build(newRawVec);
   }
   PageSlotID iPair = pTable->InsertRecord(pRecord);
+  _pTransactionManager->LogInsert(txn, iPair); // write-ahead log
   // Handle Insert on Index
   if (_pIndexManager->HasIndex(sTableName)) {
     auto iColNames = _pIndexManager->GetTableIndexes(sTableName);
@@ -326,7 +328,6 @@ std::pair<std::vector<String>, std::vector<Record *>> Instance::Join(
 
   // implemented Sort-Merge Algorithm.
   // 初始化两个表的Record*向量
-  // cout << "begin" << endl;
   const String tableName1 = iResultMap.cbegin()->first;
   std::vector<PageSlotID> pageslots1 = iResultMap.cbegin()->second;
   Table *pTable1 = GetTable(tableName1);
