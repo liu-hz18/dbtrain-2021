@@ -23,12 +23,14 @@ Instance::Instance() {
   _pTableManager = new TableManager();
   _pIndexManager = new IndexManager();
   _pTransactionManager = new TransactionManager();
+  _pRecoveryManager = new RecoveryManager();
 }
 
 Instance::~Instance() {
   delete _pTableManager;
   delete _pIndexManager;
   delete _pTransactionManager;
+  delete _pRecoveryManager;
 }
 
 Table *Instance::GetTable(const String &sTableName) const {
@@ -97,7 +99,7 @@ std::vector<PageSlotID> Intersection(std::vector<PageSlotID> iA,
 
 std::vector<PageSlotID> Instance::Search(
     const String &sTableName, Condition *pCond,
-    const std::vector<Condition *> &iIndexCond, const Transaction *txn) {
+    const std::vector<Condition *> &iIndexCond, Transaction *txn) {
   Table *pTable = GetTable(sTableName);
   if (pTable == nullptr) throw TableException();
   if (iIndexCond.size() > 0) {
@@ -151,7 +153,7 @@ PageSlotID Instance::Insert(const String &sTableName,
 
 uint32_t Instance::Delete(const String &sTableName, Condition *pCond,
                           const std::vector<Condition *> &iIndexCond,
-                          const Transaction *txn) {
+                          Transaction *txn) {
   auto iResVec = Search(sTableName, pCond, iIndexCond);
   Table *pTable = GetTable(sTableName);
   bool bHasIndex = _pIndexManager->HasIndex(sTableName);
@@ -176,7 +178,7 @@ uint32_t Instance::Delete(const String &sTableName, Condition *pCond,
 uint32_t Instance::Update(const String &sTableName, Condition *pCond,
                           const std::vector<Condition *> &iIndexCond,
                           const std::vector<Transform> &iTrans,
-                          const Transaction *txn) {
+                          Transaction *txn) {
   auto iResVec = Search(sTableName, pCond, iIndexCond);
   Table *pTable = GetTable(sTableName);
   bool bHasIndex = _pIndexManager->HasIndex(sTableName);
@@ -211,7 +213,7 @@ uint32_t Instance::Update(const String &sTableName, Condition *pCond,
 }
 
 Record *Instance::GetRecord(const String &sTableName, const PageSlotID &iPair,
-                            const Transaction *txn) const {
+                            Transaction *txn) const {
   Table *pTable = GetTable(sTableName);
   Record *pRecord = pTable->GetRecord(iPair.first, iPair.second);
   if (txn != nullptr) {
@@ -303,7 +305,7 @@ std::pair<std::vector<String>, std::vector<Record *>> Instance::Join(
     std::map<String, std::vector<PageSlotID>> &iResultMap,
     std::vector<Condition *> &iJoinConds) {
   // LAB3 BEGIN
-  // TODO:实现正确且高效的表之间JOIN过程
+  // 实现正确且高效的表之间JOIN过程
 
   // ALERT:由于实现临时表存储具有一定难度，所以允许JOIN过程中将中间结果保留在内存中，不需要存入临时表
   // ALERT:一定要注意，存在JOIN字段值相同的情况，需要特别重视
